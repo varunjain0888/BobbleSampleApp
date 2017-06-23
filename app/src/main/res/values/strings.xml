@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Bobble Sample App</string>
+    <string name="contacts_permission">Contacts</string>
+    <string name="write_contact_permission">Write Contacts</string>
+    <string name="read_contact_permission">Read Contacts</string>
+    <string name="love_gifs_sticker"><![CDATA[Love Gifs & Sticker]]></string>
+    <string name="get_more_gifs_stikers_non_bobble_keyboard"><![CDATA[Get More GIFs & Stikers on bobble keyboard]]></string>
+    <string name="get_more_love_stickers_on_nbobble_keyboard">Get More Love Stickers on\nBobble Keyboard</string>
+    <string name="share_via">Share via</string>
+    <string name="set_image_as">Set as</string>
+    <string name="black_star">black_star</string>
+    <string name="choose_bobble_keyboard">Choose</string>
+    <string name="education_bobble_keyboard">Bobble Keyboard</string>
+    <string name="keyboard_education_text4">Step 2</string>
+    <string name="keyboard_education_share_popup">Share this sticker directly from</string>
+
+</resources>
