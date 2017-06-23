@@ -24,7 +24,7 @@
             android:background="@drawable/round_corner_with_white_background"
             android:orientation="horizontal">
 
-            <com.facebook.drawee.view.SimpleDraweeView
+            <pl.droidsonroids.gif.GifImageView
                 android:id="@+id/stickerPreview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

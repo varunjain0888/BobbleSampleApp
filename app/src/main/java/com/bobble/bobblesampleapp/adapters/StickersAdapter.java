@@ -33,7 +33,7 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private Activity activity;
 
-    public StickersAdapter(Activity activity , List<Sticker> horizontalList) {
+    public StickersAdapter(Activity activity, List<Sticker> horizontalList) {
         this.list = horizontalList;
         this.activity =activity;
         Collections.reverse(list);
@@ -59,12 +59,12 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof StickersAdapter.StickerViewHolder){
             ((StickersAdapter.StickerViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)activity).openSharingDialog();
+                    ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())));
                 }
             });
             ((StickersAdapter.StickerViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));

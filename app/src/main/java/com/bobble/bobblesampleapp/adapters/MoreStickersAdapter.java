@@ -28,11 +28,11 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private static final int TYPE_ITEM = 2;
 
-    private List<Gifs> list;
+    private List<String> list;
 
     private Activity activity;
 
-    public MoreStickersAdapter(Activity activity , List<Gifs> horizontalList) {
+    public MoreStickersAdapter(Activity activity , List<String> horizontalList) {
         this.list = horizontalList;
         this.activity = activity;
         Collections.reverse(list);
@@ -66,23 +66,23 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             ((GifViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)activity).openSharingDialog();
+                    ((MainActivity)activity).openSharingDialog(0);
                 }
             });
-            ((GifViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
+            //((GifViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
         }
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return /*list.size()*/11;
     }
 
     @Override
     public int getItemViewType(int position) {
         if (position == 0) {
             return TYPE_ITEM;
-        } else if (position == list.size()-1) {
+        } else if (position == 10) {
             return TYPE_FOOTER;
         }
         return TYPE_ITEM;
