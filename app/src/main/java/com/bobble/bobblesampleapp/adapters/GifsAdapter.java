@@ -103,6 +103,15 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             });
 
+        }else if(holder instanceof FooterViewHolder){
+            ((FooterViewHolder)holder).ivGoogleplaystore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(android.content.Intent.ACTION_VIEW);
+                    i.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.touchtalent.bobbleapp"));
+                    activity.startActivity(i);
+                }
+            });
         }
     }
     void share(Uri uri,String packageName, String activityName,GifViewHolder gifViewHolder){
@@ -155,12 +164,12 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public class FooterViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView textView;
+        public ImageView ivGoogleplaystore;
 
         public FooterViewHolder(View view) {
             super(view);
 
-            textView = (TextView) view.findViewById(R.id.textview1);
+            ivGoogleplaystore = (ImageView) view.findViewById(R.id.ivGoogleplaystore);
 
         }
     }
