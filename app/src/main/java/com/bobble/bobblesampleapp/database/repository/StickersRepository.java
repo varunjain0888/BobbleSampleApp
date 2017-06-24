@@ -25,7 +25,7 @@ public class StickersRepository {
         return (getstickerDao(context).count() == 0);
     }
 
-    public static void deleteStikerWithId(Context context, long id) {
+    public static void deleteStikerWithId(Context context, int id) {
         getstickerDao(context).delete(getstickerDaoForId(context, id));
     }
 
@@ -33,7 +33,7 @@ public class StickersRepository {
         return getstickerDao(context).loadAll();
     }
 
-    public static Sticker getstickerDaoForId(Context context, long id) {
+    public static Sticker getstickerDaoForId(Context context, int id) {
         return getstickerDao(context).load(id);
     }
     public static StickerDao getstickerDao(Context c) {

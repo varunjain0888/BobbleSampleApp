@@ -23,17 +23,17 @@ public class BobbleDaoGenerator {
 
     private static void addSchema(Schema schema) {
         Entity gifs = schema.addEntity("Gifs");
-        gifs.addLongProperty("id").primaryKey().notNull().autoincrement();
+        gifs.addIntProperty("id").primaryKey().notNull();
         gifs.addStringProperty("gifName");
         gifs.addStringProperty("path");
 
         Entity sticker = schema.addEntity("Sticker");
-        sticker.addLongProperty("id").primaryKey().notNull().autoincrement();
+        sticker.addIntProperty("id").primaryKey().notNull();
         sticker.addStringProperty("stickerName");
         sticker.addStringProperty("path");
 
         Entity more = schema.addEntity("Morepacks");
-        more.addLongProperty("id").primaryKey().notNull().autoincrement();
+        more.addIntProperty("id").primaryKey().notNull();
         more.addStringProperty("packName");
         more.addStringProperty("path");
     }

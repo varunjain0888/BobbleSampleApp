@@ -6,6 +6,17 @@ package com.bobble.bobblesampleapp.util;
 
 public class BobbleConstants {
     public static final String DATABASE_NAME = "BobbleSampleDb.db";
+
     public static final String BOBBLE_FOLDER = "bobblesample";
+
+    public static final String FACEBOOK_PACKAGE_NAME = "com.facebook.katana";
+
+    public static final String FACEBOOK_CLASS_NAME = "com.facebook.composer.shareintent.ImplicitShareIntentHandlerDefaultAlias";
+
+    public static final String WHATSAPP_PACKAGE_NAME = "com.whatsapp";
+
+    public static final String WHATSAPP_CLASS_NAME = "com.whatsapp.ContactPicker";
+
+    public static final String GOOGLE_PLAY_STORE_LINK_TO_BOOBLE = "https://play.google.com/store/apps/details?id=com.touchtalent.bobbleapp";
 
 }

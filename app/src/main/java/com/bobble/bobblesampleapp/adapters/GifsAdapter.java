@@ -20,6 +20,7 @@ import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.activities.MainActivity;
 import com.bobble.bobblesampleapp.database.Gifs;
 import com.bobble.bobblesampleapp.database.Morepacks;
+import com.bobble.bobblesampleapp.util.BobbleConstants;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +42,7 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Gifs> list;
 
     private Activity activity;
+
     Intent sendIntent = new Intent(Intent.ACTION_SEND);
     Uri imageUri = null;
     public GifsAdapter(Activity activity ,List<Gifs> horizontalList) {
@@ -75,7 +77,7 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((GifViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())),list.get(position).getPath());
+                    ((MainActivity)activity).openSharingDialog(list.get(position).getId(),list.get(position).getPath());
                 }
             });
             ((GifViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
@@ -84,10 +86,10 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void onClick(View v) {
                     try {
                         imageUri = Uri.parse(MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                BitmapFactory.decodeResource(activity.getResources(),Integer.parseInt(String.valueOf(list.get(position).getId()))), null, null));
+                                BitmapFactory.decodeResource(activity.getResources(),list.get(position).getId()), null, null));
                     } catch (NullPointerException e) {
                     }
-                    share(imageUri,"com.facebook.katana","com.facebook.composer.shareintent.ImplicitShareIntentHandlerDefaultAlias",((GifsAdapter.GifViewHolder)holder));
+                    share(imageUri, BobbleConstants.FACEBOOK_PACKAGE_NAME,BobbleConstants.FACEBOOK_CLASS_NAME,((GifsAdapter.GifViewHolder)holder));
                 }
             });
 
@@ -96,10 +98,10 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void onClick(View v) {
                     try {
                         imageUri = Uri.parse(MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                BitmapFactory.decodeResource(activity.getResources(),Integer.parseInt(String.valueOf(list.get(position).getId()))), null, null));
+                                BitmapFactory.decodeResource(activity.getResources(),list.get(position).getId()), null, null));
                     } catch (NullPointerException e) {
                     }
-                    share(imageUri,"com.whatsapp","com.whatsapp.ContactPicker",((GifsAdapter.GifViewHolder)holder));
+                    share(imageUri,BobbleConstants.WHATSAPP_PACKAGE_NAME,BobbleConstants.WHATSAPP_CLASS_NAME,((GifsAdapter.GifViewHolder)holder));
                 }
             });
 
@@ -108,7 +110,7 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(android.content.Intent.ACTION_VIEW);
-                    i.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.touchtalent.bobbleapp"));
+                    i.setData(Uri.parse(BobbleConstants.GOOGLE_PLAY_STORE_LINK_TO_BOOBLE));
                     activity.startActivity(i);
                 }
             });

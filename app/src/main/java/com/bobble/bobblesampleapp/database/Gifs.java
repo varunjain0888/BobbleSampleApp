@@ -6,28 +6,28 @@ package com.bobble.bobblesampleapp.database;
  */
 public class Gifs {
 
-    private long id;
+    private int id;
     private String gifName;
     private String path;
 
     public Gifs() {
     }
 
-    public Gifs(long id) {
+    public Gifs(int id) {
         this.id = id;
     }
 
-    public Gifs(long id, String gifName, String path) {
+    public Gifs(int id, String gifName, String path) {
         this.id = id;
         this.gifName = gifName;
         this.path = path;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

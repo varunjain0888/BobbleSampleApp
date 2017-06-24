@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.activities.MainActivity;
 import com.bobble.bobblesampleapp.database.Sticker;
+import com.bobble.bobblesampleapp.util.BobbleConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,20 +83,20 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((StickersAdapter.StickerViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())),list.get(position).getPath());
+                    ((MainActivity)activity).openSharingDialog(list.get(position).getId(),list.get(position).getPath());
                 }
             });
-            ((StickersAdapter.StickerViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
+            ((StickersAdapter.StickerViewHolder)holder).ivImage.setBackgroundResource(list.get(position).getId());
 
             ((StickerViewHolder)holder).ivfacebook.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try {
                         imageUri = Uri.parse(MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                BitmapFactory.decodeResource(activity.getResources(),Integer.parseInt(String.valueOf(list.get(position).getId()))), null, null));
+                                BitmapFactory.decodeResource(activity.getResources(),list.get(position).getId()), null, null));
                     } catch (NullPointerException e) {
                     }
-                    share(imageUri,"com.facebook.katana","com.facebook.composer.shareintent.ImplicitShareIntentHandlerDefaultAlias");
+                    share(imageUri, BobbleConstants.FACEBOOK_PACKAGE_NAME,BobbleConstants.FACEBOOK_CLASS_NAME);
                 }
             });
 
@@ -104,10 +105,10 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 public void onClick(View v) {
                     try {
                         imageUri = Uri.parse(MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                BitmapFactory.decodeResource(activity.getResources(),Integer.parseInt(String.valueOf(list.get(position).getId()))), null, null));
+                                BitmapFactory.decodeResource(activity.getResources(),list.get(position).getId()), null, null));
                     } catch (NullPointerException e) {
                     }
-                    share(imageUri,"com.whatsapp","com.whatsapp.ContactPicker");
+                    share(imageUri,BobbleConstants.WHATSAPP_PACKAGE_NAME,BobbleConstants.WHATSAPP_CLASS_NAME);
                 }
             });
 
@@ -116,7 +117,7 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(android.content.Intent.ACTION_VIEW);
-                    i.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.touchtalent.bobbleapp"));
+                    i.setData(Uri.parse(BobbleConstants.GOOGLE_PLAY_STORE_LINK_TO_BOOBLE));
                     activity.startActivity(i);
                 }
             });

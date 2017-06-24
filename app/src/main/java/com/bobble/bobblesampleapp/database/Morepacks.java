@@ -6,28 +6,28 @@ package com.bobble.bobblesampleapp.database;
  */
 public class Morepacks {
 
-    private long id;
+    private int id;
     private String packName;
     private String path;
 
     public Morepacks() {
     }
 
-    public Morepacks(long id) {
+    public Morepacks(int id) {
         this.id = id;
     }
 
-    public Morepacks(long id, String packName, String path) {
+    public Morepacks(int id, String packName, String path) {
         this.id = id;
         this.packName = packName;
         this.path = path;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
