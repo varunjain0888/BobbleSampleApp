@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.bobble.bobblesampleapp.database.DaoMaster;
 import com.bobble.bobblesampleapp.database.DaoSession;
-import com.bobble.bobblesampleapp.util.Constants;
+import com.bobble.bobblesampleapp.util.BobbleConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -35,7 +35,7 @@ public class BobbleSampleApp extends Application {
 
     public void setupDatabase() {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this,
-                Constants.DATABASE_NAME, null);
+                BobbleConstants.DATABASE_NAME, null);
         SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();

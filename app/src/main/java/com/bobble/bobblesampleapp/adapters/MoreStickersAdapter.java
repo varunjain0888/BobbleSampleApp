@@ -4,12 +4,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.activities.MainActivity;
-import com.bobble.bobblesampleapp.database.Gifs;
+import com.bobble.bobblesampleapp.database.Morepacks;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,11 +29,11 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private static final int TYPE_ITEM = 2;
 
-    private List<String> list;
+    private List<Morepacks> list;
 
     private Activity activity;
 
-    public MoreStickersAdapter(Activity activity , List<String> horizontalList) {
+    public MoreStickersAdapter(Activity activity , List<Morepacks> horizontalList) {
         this.list = horizontalList;
         this.activity = activity;
         Collections.reverse(list);
@@ -47,7 +48,7 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (viewType == TYPE_ITEM) {
             //Inflating recycle view item layout
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gifs, parent, false);
-            return new GifViewHolder(itemView);
+            return new MorePacksViewHolder(itemView);
         } else if (viewType == TYPE_HEADER) {
             //Inflating header view
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.footer_gifs, parent, false);
@@ -62,20 +63,20 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        if (holder instanceof GifViewHolder){
-            ((GifViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
+        if (holder instanceof MorePacksViewHolder){
+            ((MorePacksViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)activity).openSharingDialog(0);
+                    //((MainActivity)activity).openSharingDialog(0);
                 }
             });
-            //((GifViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
+            ((MorePacksViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
         }
     }
 
     @Override
     public int getItemCount() {
-        return /*list.size()*/11;
+        return list.size();
     }
 
     @Override
@@ -89,15 +90,21 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
-    public class GifViewHolder extends RecyclerView.ViewHolder {
+    public class MorePacksViewHolder extends RecyclerView.ViewHolder {
 
         public LinearLayout llRoot;
         public GifImageView ivImage;
-        public GifViewHolder(View view) {
+        public ImageView ivfacebook;
+        public ImageView ivWhatsapp;
+        public MorePacksViewHolder(View view) {
             super(view);
 
             llRoot = (LinearLayout) view.findViewById(R.id.llRoot);
             ivImage = (GifImageView)view.findViewById(R.id.ivImage);
+            ivfacebook = (ImageView)view.findViewById(R.id.ivfacebook);
+            ivWhatsapp = (ImageView)view.findViewById(R.id.ivWhatsapp);
+            ivfacebook.setVisibility(View.INVISIBLE);
+            ivWhatsapp.setVisibility(View.INVISIBLE);
         }
     }
 

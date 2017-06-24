@@ -2,8 +2,10 @@ package com.bobble.bobblesampleapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,9 +22,18 @@ import com.bobble.bobblesampleapp.adapters.GifShareAsAdapter;
 import com.bobble.bobblesampleapp.adapters.GifsAdapter;
 import com.bobble.bobblesampleapp.adapters.MoreStickersAdapter;
 import com.bobble.bobblesampleapp.adapters.StickersAdapter;
+import com.bobble.bobblesampleapp.custom.CircleProgressBarDrawable;
 import com.bobble.bobblesampleapp.custom.PaddingItemDecoration;
 import com.bobble.bobblesampleapp.database.repository.GifsRepository;
+import com.bobble.bobblesampleapp.database.repository.MorePacksRepository;
 import com.bobble.bobblesampleapp.database.repository.StickersRepository;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
+
 import java.util.ArrayList;
 
 import pl.droidsonroids.gif.GifImageView;
@@ -84,13 +95,14 @@ public class MainActivity extends AppCompatActivity {
         rvSticker.setAdapter(stickersAdapter);
 
 
-        moreStickersAdapter = new MoreStickersAdapter(this, new ArrayList<String>());
+        moreStickersAdapter = new MoreStickersAdapter(this, MorePacksRepository.getAllPacks(context));
         rvMore.setAdapter(moreStickersAdapter);
 
 
         rvGifs.addItemDecoration(new PaddingItemDecoration(50));
         rvSticker.addItemDecoration(new PaddingItemDecoration(50));
         rvMore.addItemDecoration(new PaddingItemDecoration(50));
+
     }
 
     public static Intent getStartIntent(Context context) {
@@ -98,16 +110,22 @@ public class MainActivity extends AppCompatActivity {
         return intent;
     }
 
-    public void openSharingDialog(int resId) {
+    public void openSharingDialog(int resId,String path) {
+        Uri imageUri = null;
+            try {
+                imageUri = Uri.parse(MediaStore.Images.Media.insertImage(this.getContentResolver(),
+                        BitmapFactory.decodeResource(getResources(),resId), null, null));
+            } catch (NullPointerException e) {
+            }
         stickerPreview.setImageResource(resId);
         llShare.setVisibility(View.VISIBLE);
         llShare.startAnimation(slide_up);
-        onShare();
+        onShare(imageUri);
     }
 
-    public void onShare() {
+    public void onShare(Uri uri) {
         recyclerViewShare.setLayoutManager(new GridLayoutManager(context,4));
-        gifShareAsAdapter = new GifShareAsAdapter(this);
+        gifShareAsAdapter = new GifShareAsAdapter(this,uri);
         recyclerViewShare.setAdapter(gifShareAsAdapter);
         llShare.setVisibility(View.VISIBLE);
         llShare.startAnimation(slide_up);

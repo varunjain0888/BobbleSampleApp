@@ -12,7 +12,7 @@ public class BobbleDaoGenerator {
 
     public static void main(String[] args) throws Exception {
 
-        Schema schema = new Schema(1017, "com.bobble.bobblesampleapp");
+        Schema schema = new Schema(1017, "com.bobble.bobblesampleapp.database");
 
         addSchema(schema);
 
@@ -27,9 +27,14 @@ public class BobbleDaoGenerator {
         gifs.addStringProperty("gifName");
         gifs.addStringProperty("path");
 
-        Entity sticker = schema.addEntity("sticker");
+        Entity sticker = schema.addEntity("Sticker");
         sticker.addLongProperty("id").primaryKey().notNull().autoincrement();
         sticker.addStringProperty("stickerName");
         sticker.addStringProperty("path");
+
+        Entity more = schema.addEntity("Morepacks");
+        more.addLongProperty("id").primaryKey().notNull().autoincrement();
+        more.addStringProperty("packName");
+        more.addStringProperty("path");
     }
 }

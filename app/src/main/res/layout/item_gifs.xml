@@ -31,16 +31,24 @@
         android:layout_gravity="bottom|right"
         android:layout_marginRight="10dp">
         <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_launcher"
+            android:id="@+id/ivfacebook"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/group_2"
             android:layout_marginRight="5dp"
+            android:layout_marginTop="2dp"
             />
         <ImageView
+            android:id="@+id/ivWhatsapp"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/ic_launcher"
+            android:src="@drawable/group_11"
             />
     </LinearLayout>
-
+    <ProgressBar
+        android:id="@+id/ivProgressBar"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 </FrameLayout>

@@ -13,5 +13,6 @@
     <string name="education_bobble_keyboard">Bobble Keyboard</string>
     <string name="keyboard_education_text4">Step 2</string>
     <string name="keyboard_education_share_popup">Share this sticker directly from</string>
+    <string name="facebook_app_id">700197120088450</string>
 
 </resources>

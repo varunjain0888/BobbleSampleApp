@@ -35,17 +35,10 @@ public class GifShareAsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     protected Activity context;
     protected List<ResolveInfo> list = new ArrayList<>();
     protected PackageManager pm;
-    Uri finalUri;
-    long bobbleAnimationPackId;
-    String otfText;
-    int sharingPosition;
-
-    public GifShareAsAdapter(Activity context) {
+    private Uri finalUri;
+    public GifShareAsAdapter(Activity context,Uri finalUri) {
         this.context = context;
         this.finalUri = finalUri;
-        this.otfText = otfText;
-        this.bobbleAnimationPackId = bobbleAnimationPackId;
-        this.sharingPosition = sharingPosition;
         pm = context.getPackageManager();
         sendIntent.setType("image/gif");
         list = pm.queryIntentActivities(sendIntent, 0);
@@ -157,6 +150,18 @@ public class GifShareAsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         vh2.containerLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ActivityInfo activity = list.get(position).activityInfo;
+                ComponentName name = new ComponentName(activity.applicationInfo.packageName, activity.name);
+                Log.d(TAG, "ComponentName : " + name);
+                Uri shareableUri = finalUri;
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+                shareIntent.setType("image/gif");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, shareableUri);
+                shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                shareIntent.setComponent(name);
+                context.startActivity(shareIntent);
             }
         });
     }
