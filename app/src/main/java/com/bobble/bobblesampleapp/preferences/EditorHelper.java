@@ -2,9 +2,8 @@ package com.bobble.bobblesampleapp.preferences;
 
 import android.content.SharedPreferences;
 
-
 /**
- * Created by amitshekhar on 26/04/16.
+ * Created by varunjain on 26/06/17.
  */
 public abstract class EditorHelper<T extends EditorHelper<T>> {
 

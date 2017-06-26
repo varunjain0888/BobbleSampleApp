@@ -3,11 +3,17 @@ package com.bobble.bobblesampleapp;
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.androidnetworking.AndroidNetworking;
 import com.bobble.bobblesampleapp.database.DaoMaster;
 import com.bobble.bobblesampleapp.database.DaoSession;
+import com.bobble.bobblesampleapp.preferences.BobblePrefs;
+import com.bobble.bobblesampleapp.services.BackgroundJobCreator;
+import com.bobble.bobblesampleapp.util.AppUtils;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
+import com.evernote.android.job.JobManager;
 import com.facebook.drawee.backends.pipeline.Fresco;
 
+import co.tmobi.Skydive;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
@@ -26,6 +32,19 @@ public class BobbleSampleApp extends Application {
         appInstance = this;
         CalligraphyConfig.initDefault(mCalligraphyConfig);
         Fresco.initialize(getApplicationContext());
+        AndroidNetworking.initialize(getApplicationContext());
+        JobManager.create(getApplicationContext()).addJobCreator(new BackgroundJobCreator()); // initialising JobManger
+        BobblePrefs bobblePrefs = new BobblePrefs(this);
+        if (bobblePrefs.appVersion().get() != 0 && AppUtils.getAppVersion(this) > bobblePrefs.appVersion().get()) {
+            bobblePrefs.isRegistered().put(false);
+            AppUtils.updateAppVersion(this);
+        } else if (bobblePrefs.appVersion().get() == 0) {
+            AppUtils.updateAppVersion(this);
+            bobblePrefs.hasAssetsUrlCallCompleted().put(true);
+        }
+        if (bobblePrefs.deviceId().get().isEmpty()) {
+            bobblePrefs.deviceId().put(AppUtils.getDeviceId(this));
+        }
         try {
             setupDatabase();
         } catch (Exception e) {
@@ -47,5 +66,8 @@ public class BobbleSampleApp extends Application {
     }
     public static synchronized BobbleSampleApp getInstance() {
         return appInstance;
+    }
+    public void initialiseSimilarWeb() {
+        Skydive.start(getApplicationContext());
     }
 }

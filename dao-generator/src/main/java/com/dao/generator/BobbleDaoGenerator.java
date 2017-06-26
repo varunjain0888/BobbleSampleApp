@@ -23,18 +23,31 @@ public class BobbleDaoGenerator {
 
     private static void addSchema(Schema schema) {
         Entity gifs = schema.addEntity("Gifs");
-        gifs.addIntProperty("id").primaryKey().notNull();
+        gifs.addLongProperty("id").primaryKey().notNull();
         gifs.addStringProperty("gifName");
         gifs.addStringProperty("path");
 
         Entity sticker = schema.addEntity("Sticker");
-        sticker.addIntProperty("id").primaryKey().notNull();
+        sticker.addLongProperty("id").primaryKey().notNull();
         sticker.addStringProperty("stickerName");
         sticker.addStringProperty("path");
 
         Entity more = schema.addEntity("Morepacks");
-        more.addIntProperty("id").primaryKey().notNull();
+        more.addLongProperty("id").primaryKey().notNull();
         more.addStringProperty("packName");
         more.addStringProperty("path");
+
+        Entity logEvents = schema.addEntity("LogEvents");
+        logEvents.addIdProperty();
+        logEvents.addStringProperty("screenName").notNull();
+        logEvents.addStringProperty("eventAction").notNull();
+        logEvents.addStringProperty("eventName").notNull();
+        logEvents.addStringProperty("eventLabel").notNull();
+        logEvents.addLongProperty("eventTimestamp").notNull();
+        logEvents.addStringProperty("status").notNull();
+
+        Entity preferences = schema.addEntity("Preferences");
+        preferences.addStringProperty("key").primaryKey().notNull();
+        preferences.addStringProperty("value");
     }
 }

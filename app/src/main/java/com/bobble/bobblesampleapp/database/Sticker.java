@@ -6,28 +6,28 @@ package com.bobble.bobblesampleapp.database;
  */
 public class Sticker {
 
-    private int id;
+    private long id;
     private String stickerName;
     private String path;
 
     public Sticker() {
     }
 
-    public Sticker(int id) {
+    public Sticker(long id) {
         this.id = id;
     }
 
-    public Sticker(int id, String stickerName, String path) {
+    public Sticker(long id, String stickerName, String path) {
         this.id = id;
         this.stickerName = stickerName;
         this.path = path;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

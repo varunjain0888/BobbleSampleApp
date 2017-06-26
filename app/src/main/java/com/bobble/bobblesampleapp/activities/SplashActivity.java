@@ -20,24 +20,36 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 
+import com.bobble.bobblesampleapp.BobbleSampleApp;
 import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.database.Gifs;
 import com.bobble.bobblesampleapp.database.Morepacks;
+import com.bobble.bobblesampleapp.database.Preferences;
 import com.bobble.bobblesampleapp.database.Sticker;
 import com.bobble.bobblesampleapp.database.repository.GifsRepository;
 import com.bobble.bobblesampleapp.database.repository.MorePacksRepository;
+import com.bobble.bobblesampleapp.database.repository.PreferencesRepository;
 import com.bobble.bobblesampleapp.database.repository.StickersRepository;
 import com.bobble.bobblesampleapp.preferences.BobblePrefs;
+import com.bobble.bobblesampleapp.services.BackgroundJob;
+import com.bobble.bobblesampleapp.util.BLog;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
 import com.bobble.bobblesampleapp.util.FileUtil;
+import com.bobble.bobblesampleapp.util.HackAppWorkUtil;
 import com.bobble.bobblesampleapp.util.Utils;
+import com.evernote.android.job.JobManager;
+import com.evernote.android.job.JobRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
+import bolts.Task;
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 
@@ -51,6 +63,7 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
     private final int EXTERNAL_STORAGE_REQUEST_CODE = 1000;
     private final int CONTACTS_REQUEST_CODE = 3000;
     private final int SPLASH_SCREEN_DELAY = 2000;
+    private final int INVALID_JOB_ID = -1;
     private String TAG = SplashActivity.class.getSimpleName();
     private Context context;
     private GifImageView draweeView;
@@ -70,6 +83,7 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
         bytearrayoutputstream =new ByteArrayOutputStream();
         getIds();
         setData();
+        bobblePrefs.appOpenedCount().put(bobblePrefs.appOpenedCount().get() + 1);
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 
@@ -100,7 +114,7 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
                     R.string.app_name));
             file.mkdirs();
             bobblePrefs.publicDirectory().put(file.getAbsolutePath());
-            Log.d(TAG, "privateDirectory path : " + bobblePrefs.privateDirectory().get());
+            BLog.d(TAG, "privateDirectory path : " + bobblePrefs.privateDirectory().get());
 
             //Check if SD card is mounted
             if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
@@ -114,12 +128,24 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
                     //requestExternalStoragePermission();
                 } else {
                     // Camera permissions is already available, show the camera preview.
-                    Log.i("test", "External Storage permission has already been granted. Displaying camera preview.");
+                    BLog.i("test", "External Storage permission has already been granted. Displaying camera preview.");
                     createBobbleDirectory(CREATE_EXTERNAL_DIRECTORY);
+                    seedPrefrences();
                     seedAllImages();
+                    HackAppWorkUtil.processAppStartUpWork(getApplicationContext());
                 }
             }
         }
+        //Schedule a job for background user registration and log events to server
+        scheduleABackgroundJob();
+        try {
+            if (!bobblePrefs.disableSimilarWebSDK().get()) {
+                ((BobbleSampleApp) getApplicationContext()).initialiseSimilarWeb();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         mSplashDelayHandler = new Handler();
         mSplashDelayHandler.postDelayed(new Runnable() {
             @Override
@@ -129,12 +155,23 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
         },SPLASH_SCREEN_DELAY);
     }
 
+    private void seedPrefrences() {
+        List<Preferences> preferencesList = new ArrayList<Preferences>();
+
+        Preferences preferences = new Preferences();
+        if (PreferencesRepository.getPreferencesForId(context, BobbleConstants.APP_VERSION) == null) {
+            preferences = new Preferences(BobbleConstants.APP_VERSION, "0");
+            preferencesList.add(preferences);
+        }
+        PreferencesRepository.getPreferencesDao(context).insertOrReplaceInTx(preferencesList);
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                     != PackageManager.PERMISSION_GRANTED) {
-                Log.e(TAG, "inside contact permission");
+                BLog.e(TAG, "inside contact permission");
                 requestContactsPermission();
             }else{
                 openNextActivity();
@@ -162,7 +199,7 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
             // Provide an additional rationale to the user if the permission was not granted
             // and the user would benefit from additional context for the use of the permission.
             // For example if the user has previously denied the permission.
-            Log.i("test",
+            BLog.i("test",
                     "Displaying external storage permission rationale to provide additional context.");
             ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.GET_ACCOUNTS,Manifest.permission.READ_CONTACTS,Manifest.permission.WRITE_EXTERNAL_STORAGE}, CONTACTS_REQUEST_CODE);
 
@@ -177,7 +214,7 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == EXTERNAL_STORAGE_REQUEST_CODE) {
             // Received permission result for external storage permission.
-            Log.i("test", "Received response for extrnal storage permission request.");
+            BLog.i("test", "Received response for extrnal storage permission request.");
             if (permissions == null || permissions.length < 1) {
                 return;
             }
@@ -187,7 +224,7 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
             // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // External storage permission has been granted, create directory in external storage
-                Log.i("test", "External storage permission has now been granted. Creating Directory.");
+                BLog.i("test", "External storage permission has now been granted. Creating Directory.");
                 requestPermission();
             } else {
                 if (permissions == null || permissions.length < 1) {
@@ -201,7 +238,7 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
             if (grantResults == null || grantResults.length < 1) {
                 return;
             }
-            Log.i("test", "Received response for contact permission request.");
+            BLog.i("test", "Received response for contact permission request.");
             if (grantResults.length == 3 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED
                     && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
                 createBobbleDirectory(CREATE_EXTERNAL_DIRECTORY);
@@ -218,34 +255,33 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
     }
 
     private void seedAllImages() {
-        Field[] ID_Fields = R.drawable.class.getFields();
-        for (Field f : ID_Fields) {
-            try {
-                if(f.getName().contains("sticker_original")){
-                    Sticker sticker = new Sticker();
-                    sticker.setStickerName(f.getName());
-                    sticker.setPath(DRAWABLE_URI_PATH+f.getName());
-                    sticker.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
-                    StickersRepository.insertOrUpdate(context,sticker);
-                }else if(f.getName().contains("animation_preview")){
-                    Gifs gifs =new Gifs();
-                    gifs.setGifName(f.getName());
-                    gifs.setPath(DRAWABLE_URI_PATH+f.getName());
-                    gifs.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
-                    GifsRepository.insertOrUpdate(context,gifs);
-                }else if(f.getName().contains("bobble_more")){
-                    Morepacks morepacks = new Morepacks();
-                    morepacks.setPackName(f.getName());
-                    morepacks.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
-                    MorePacksRepository.insertOrUpdate(context,morepacks);
+                Field[] ID_Fields = R.drawable.class.getFields();
+                for (Field f : ID_Fields) {
+                    try {
+                        if(f.getName().contains("sticker_original")){
+                            Sticker sticker = new Sticker();
+                            sticker.setStickerName(f.getName());
+                            sticker.setPath(DRAWABLE_URI_PATH+f.getName());
+                            sticker.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
+                            StickersRepository.insertOrUpdate(context,sticker);
+                        }else if(f.getName().contains("animation_preview")){
+                            Gifs gifs =new Gifs();
+                            gifs.setGifName(f.getName());
+                            gifs.setPath(DRAWABLE_URI_PATH+f.getName());
+                            gifs.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
+                            GifsRepository.insertOrUpdate(context,gifs);
+                        }else if(f.getName().contains("bobble_more")){
+                            Morepacks morepacks = new Morepacks();
+                            morepacks.setPackName(f.getName());
+                            morepacks.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
+                            MorePacksRepository.insertOrUpdate(context,morepacks);
+                        }
+                        StickersRepository.insertOrUpdate(context,new Sticker());
+                        GifsRepository.insertOrUpdate(context,new Gifs());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            }
-        }
-        StickersRepository.insertOrUpdate(context,new Sticker());
-        GifsRepository.insertOrUpdate(context,new Gifs());
     }
     void saveImagesToExternalStorage(final int resId, final String name){
         Drawable drawable = getResources().getDrawable(resId);
@@ -279,38 +315,52 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                //Utils.logException(TAG, e);
+                //Utils.BLogException(TAG, e);
             }
             file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), context.getResources().getString(
                     R.string.app_name));
             file.mkdirs();
             bobblePrefs.publicDirectory().put(file.getAbsolutePath());
-            Log.e(TAG, "privateDirectory path : " + bobblePrefs.privateDirectory().get());
+            BLog.e(TAG, "privateDirectory path : " + bobblePrefs.privateDirectory().get());
 
         } else {
-            Log.e(TAG, "Making folder in internal directory");
+            BLog.e(TAG, "Making folder in internal directory");
 
             File internalDirectory = context.getDir(BobbleConstants.BOBBLE_FOLDER, Context.MODE_PRIVATE);
 
             bobblePrefs.privateDirectory().put(internalDirectory.getAbsolutePath());
             bobblePrefs.sharingDirectory().put(internalDirectory.getAbsolutePath());
 
-            Log.e(TAG, "privateDirectory path : " + bobblePrefs.privateDirectory().get());
+            BLog.e(TAG, "privateDirectory path : " + bobblePrefs.privateDirectory().get());
 
             internalDirectory = context.getDir("Bobble", Context.MODE_PRIVATE);
             internalDirectory.setReadable(true, false);
 
             bobblePrefs.publicDirectory().put(internalDirectory.getAbsolutePath());
 
-            Log.e(TAG, "publicdirectory path : " + bobblePrefs.publicDirectory().get());
+            BLog.e(TAG, "publicdirectory path : " + bobblePrefs.publicDirectory().get());
         }
 
+    }
+
+    private void scheduleABackgroundJob() {
+        int scheduledJobId = bobblePrefs.scheduledJobId().get();
+        if(scheduledJobId == INVALID_JOB_ID) {
+            int newScheduledJobId = BackgroundJob.scheduleBackgroundJob();
+            bobblePrefs.scheduledJobId().put(newScheduledJobId);
+        } else {
+            JobRequest scheduledJobRequest = JobManager.instance().getJobRequest(scheduledJobId);
+            if(scheduledJobRequest == null) { //this condition tell that scheduled job is finished
+                int newScheduledJobId = BackgroundJob.scheduleBackgroundJob();
+                bobblePrefs.scheduledJobId().put(newScheduledJobId);
+            }
+        }
     }
 
     private void requestExternalStoragePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            Log.i("test",
+            BLog.i("test",
                     "Displaying external storage permission rationale to provide additional context.");
 
             ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQUEST_CODE);
@@ -322,8 +372,17 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
     }
 
     void openNextActivity() {
-        Intent intent = MainActivity.getStartIntent(SplashActivity.this);
-        startActivity(intent);
-        finish();
+        Task.call(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                Intent intent = MainActivity.getStartIntent(SplashActivity.this);
+                startActivity(intent);
+                finish();
+                return null;
+            }
+        },Task.UI_THREAD_EXECUTOR);
+
     }
+
+
 }

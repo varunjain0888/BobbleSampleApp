@@ -24,7 +24,7 @@ public class MorePacksRepository {
         return (getMorepacksDao(context).count() == 0);
     }
 
-    public static void deletePacksWithId(Context context, int id) {
+    public static void deletePacksWithId(Context context, long id) {
         getMorepacksDao(context).delete(getPacksForId(context, id));
     }
 
@@ -32,7 +32,7 @@ public class MorePacksRepository {
         return getMorepacksDao(context).loadAll();
     }
 
-    public static Morepacks getPacksForId(Context context, int id) {
+    public static Morepacks getPacksForId(Context context, long id) {
         return getMorepacksDao(context).load(id);
     }
     public static MorepacksDao getMorepacksDao(Context c) {

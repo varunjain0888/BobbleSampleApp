@@ -13,7 +13,7 @@ import de.greenrobot.dao.internal.DaoConfig;
 /**
  * DAO for table "MOREPACKS".
 */
-public class MorepacksDao extends AbstractDao<Morepacks, Integer> {
+public class MorepacksDao extends AbstractDao<Morepacks, Long> {
 
     public static final String TABLENAME = "MOREPACKS";
 
@@ -22,7 +22,7 @@ public class MorepacksDao extends AbstractDao<Morepacks, Integer> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Id = new Property(0, int.class, "id", true, "ID");
+        public final static Property Id = new Property(0, long.class, "id", true, "ID");
         public final static Property PackName = new Property(1, String.class, "packName", false, "PACK_NAME");
         public final static Property Path = new Property(2, String.class, "path", false, "PATH");
     };
@@ -70,15 +70,15 @@ public class MorepacksDao extends AbstractDao<Morepacks, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Morepacks readEntity(Cursor cursor, int offset) {
         Morepacks entity = new Morepacks( //
-            cursor.getInt(offset + 0), // id
+            cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // packName
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // path
         );
@@ -88,20 +88,21 @@ public class MorepacksDao extends AbstractDao<Morepacks, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Morepacks entity, int offset) {
-        entity.setId(cursor.getInt(offset + 0));
+        entity.setId(cursor.getLong(offset + 0));
         entity.setPackName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setPath(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
      }
     
     /** @inheritdoc */
     @Override
-    protected Integer updateKeyAfterInsert(Morepacks entity, long rowId) {
-        return entity.getId();
+    protected Long updateKeyAfterInsert(Morepacks entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(Morepacks entity) {
+    public Long getKey(Morepacks entity) {
         if(entity != null) {
             return entity.getId();
         } else {

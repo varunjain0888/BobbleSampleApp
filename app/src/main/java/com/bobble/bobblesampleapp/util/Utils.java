@@ -5,6 +5,12 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
 
+import com.bobble.bobblesampleapp.database.LogEvents;
+import com.bobble.bobblesampleapp.database.LogEventsDao;
+import com.bobble.bobblesampleapp.database.repository.LogEventsRepository;
+
+import java.util.List;
+
 /**
  * Created by varunjain on 6/23/17.
  */
@@ -26,5 +32,17 @@ public class Utils {
             return emailId;
         }
         return "";
+    }
+
+    public static void logException(String TAG, final Exception e) {
+        BLog.e(TAG, e.getMessage() + "");
+    }
+
+    static void resetStatusOfSendingEvents(Context context) {
+        List<LogEvents> logEventsList = LogEventsRepository.getLogEventsDao(context).queryBuilder().where(LogEventsDao.Properties.Status.eq(BobbleConstants.SENDING)).list();
+        for (int i = 0; i < logEventsList.size(); i++) {
+            logEventsList.get(i).setStatus(BobbleConstants.NOT_SENT);
+        }
+        LogEventsRepository.getLogEventsDao(context).insertOrReplaceInTx(logEventsList);
     }
 }

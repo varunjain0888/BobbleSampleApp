@@ -13,7 +13,7 @@ import de.greenrobot.dao.internal.DaoConfig;
 /**
  * DAO for table "STICKER".
 */
-public class StickerDao extends AbstractDao<Sticker, Integer> {
+public class StickerDao extends AbstractDao<Sticker, Long> {
 
     public static final String TABLENAME = "STICKER";
 
@@ -22,7 +22,7 @@ public class StickerDao extends AbstractDao<Sticker, Integer> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Id = new Property(0, int.class, "id", true, "ID");
+        public final static Property Id = new Property(0, long.class, "id", true, "ID");
         public final static Property StickerName = new Property(1, String.class, "stickerName", false, "STICKER_NAME");
         public final static Property Path = new Property(2, String.class, "path", false, "PATH");
     };
@@ -70,15 +70,15 @@ public class StickerDao extends AbstractDao<Sticker, Integer> {
 
     /** @inheritdoc */
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public Sticker readEntity(Cursor cursor, int offset) {
         Sticker entity = new Sticker( //
-            cursor.getInt(offset + 0), // id
+            cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // stickerName
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // path
         );
@@ -88,20 +88,21 @@ public class StickerDao extends AbstractDao<Sticker, Integer> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, Sticker entity, int offset) {
-        entity.setId(cursor.getInt(offset + 0));
+        entity.setId(cursor.getLong(offset + 0));
         entity.setStickerName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setPath(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
      }
     
     /** @inheritdoc */
     @Override
-    protected Integer updateKeyAfterInsert(Sticker entity, long rowId) {
-        return entity.getId();
+    protected Long updateKeyAfterInsert(Sticker entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Integer getKey(Sticker entity) {
+    public Long getKey(Sticker entity) {
         if(entity != null) {
             return entity.getId();
         } else {

@@ -20,6 +20,7 @@ import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.activities.MainActivity;
 import com.bobble.bobblesampleapp.database.Gifs;
 import com.bobble.bobblesampleapp.database.Morepacks;
+import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
 
 import java.util.Collections;
@@ -77,7 +78,7 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((GifViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)activity).openSharingDialog(list.get(position).getId(),list.get(position).getPath());
+                    ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())),list.get(position).getPath());
                 }
             });
             ((GifViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
@@ -86,7 +87,7 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void onClick(View v) {
                     try {
                         imageUri = Uri.parse(MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                BitmapFactory.decodeResource(activity.getResources(),list.get(position).getId()), null, null));
+                                BitmapFactory.decodeResource(activity.getResources(),Integer.parseInt(String.valueOf(list.get(position).getId()))), null, null));
                     } catch (NullPointerException e) {
                     }
                     share(imageUri, BobbleConstants.FACEBOOK_PACKAGE_NAME,BobbleConstants.FACEBOOK_CLASS_NAME,((GifsAdapter.GifViewHolder)holder));
@@ -98,7 +99,7 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void onClick(View v) {
                     try {
                         imageUri = Uri.parse(MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                BitmapFactory.decodeResource(activity.getResources(),list.get(position).getId()), null, null));
+                                BitmapFactory.decodeResource(activity.getResources(),Integer.parseInt(String.valueOf(list.get(position).getId()))), null, null));
                     } catch (NullPointerException e) {
                     }
                     share(imageUri,BobbleConstants.WHATSAPP_PACKAGE_NAME,BobbleConstants.WHATSAPP_CLASS_NAME,((GifsAdapter.GifViewHolder)holder));
@@ -109,6 +110,8 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((FooterViewHolder)holder).ivGoogleplaystore.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //Hack app analytics
+                    BobbleEvent.getInstance().log(BobbleConstants.HOME_SCREEN, "click on get more love gifs", "google_play_store_view", "", System.currentTimeMillis() / 1000);
                     Intent i = new Intent(android.content.Intent.ACTION_VIEW);
                     i.setData(Uri.parse(BobbleConstants.GOOGLE_PLAY_STORE_LINK_TO_BOOBLE));
                     activity.startActivity(i);

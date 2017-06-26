@@ -1,7 +1,7 @@
 package com.bobble.bobblesampleapp.preferences;
 
 /**
- * Created by amitshekhar on 26/04/16.
+ * Created by varunjain on 26/06/17.
  */
 public final class StringPrefEditorField<T extends EditorHelper<T>> extends AbstractPrefEditorField<T> {
 

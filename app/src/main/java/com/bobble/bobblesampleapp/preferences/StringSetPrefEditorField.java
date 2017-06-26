@@ -3,7 +3,7 @@ package com.bobble.bobblesampleapp.preferences;
 import java.util.Set;
 
 /**
- * Created by amitshekhar on 26/04/16.
+ * Created by varunjain on 26/06/17.
  */
 public final class StringSetPrefEditorField<T extends EditorHelper<T>> extends AbstractPrefEditorField<T> {
 

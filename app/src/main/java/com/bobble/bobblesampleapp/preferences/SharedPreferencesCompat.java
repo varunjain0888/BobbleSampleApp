@@ -1,9 +1,8 @@
 package com.bobble.bobblesampleapp.preferences;
 
 /**
- * Created by amitshekhar on 26/04/16.
+ * Created by varunjain on 26/06/17.
  */
-
 import android.content.SharedPreferences;
 
 import java.lang.reflect.InvocationTargetException;

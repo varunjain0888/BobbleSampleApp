@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import java.io.File;
 
 /**
- * Created by amitshekhar on 05/10/16.
+ * Created by varunjain on 26/06/17.
  */
 
 public class UriUtils {

@@ -27,6 +27,8 @@ import com.bobble.bobblesampleapp.custom.PaddingItemDecoration;
 import com.bobble.bobblesampleapp.database.repository.GifsRepository;
 import com.bobble.bobblesampleapp.database.repository.MorePacksRepository;
 import com.bobble.bobblesampleapp.database.repository.StickersRepository;
+import com.bobble.bobblesampleapp.singletons.BobbleEvent;
+import com.bobble.bobblesampleapp.util.BobbleConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
@@ -62,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
+        //Hack app analytics
+        BobbleEvent.getInstance().log(BobbleConstants.HOME_SCREEN, "Landed on the home screen", "home_screen_view", "", System.currentTimeMillis() / 1000);
         getIds();
         slide_up = AnimationUtils.loadAnimation(context, R.anim.slide_up);
         slide_down = AnimationUtils.loadAnimation(context, R.anim.slide_down);

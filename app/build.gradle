@@ -12,9 +12,15 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://growthapk.bobbleapp.asia/v1/\"")
+            buildConfigField("String", "API_KEY", "\"ABCXYZ123TEST\"")
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL", "\"http://growthapk.bobbleapp.asia/v1/\"")
+            buildConfigField("String", "API_KEY", "\"ABCXYZ123TEST\"")
         }
     }
 }
@@ -36,8 +42,11 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
 
     compile "com.facebook.fresco:animated-base-support:$rootProject.frescoBaseVersion"
+    compile "com.facebook.device.yearclass:yearclass:$rootProject.facebookyearclass"
     compile "com.facebook.fresco:animated-gif:$rootProject.frescoBaseVersion"
     compile "com.facebook.fresco:fresco:$rootProject.frescoVersion"
     compile "de.greenrobot:greendao:$rootProject.greenDaoVersion"
     debugCompile "com.amitshekhar.android:debug-db:$rootProject.androidDatabasedebugVersion"
+    compile "com.amitshekhar.android:android-networking:$rootProject.androidNetworking"
+    compile "de.greenrobot:eventbus:$rootProject.eventbusVersion"
 }

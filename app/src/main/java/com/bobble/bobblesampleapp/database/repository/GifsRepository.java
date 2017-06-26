@@ -24,7 +24,7 @@ public class GifsRepository {
         return (getGifDao(context).count() == 0);
     }
 
-    public static void deleteGifWithId(Context context, int id) {
+    public static void deleteGifWithId(Context context, long id) {
         getGifDao(context).delete(getGifsForId(context, id));
     }
 
@@ -32,7 +32,7 @@ public class GifsRepository {
         return getGifDao(context).loadAll();
     }
 
-    public static Gifs getGifsForId(Context context, int id) {
+    public static Gifs getGifsForId(Context context, long id) {
         return getGifDao(context).load(id);
     }
     public static GifsDao getGifDao(Context c) {

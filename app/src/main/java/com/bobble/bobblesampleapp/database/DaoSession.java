@@ -21,10 +21,14 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig gifsDaoConfig;
     private final DaoConfig stickerDaoConfig;
     private final DaoConfig morepacksDaoConfig;
+    private final DaoConfig logEventsDaoConfig;
+    private final DaoConfig preferencesDaoConfig;
 
     private final GifsDao gifsDao;
     private final StickerDao stickerDao;
     private final MorepacksDao morepacksDao;
+    private final LogEventsDao logEventsDao;
+    private final PreferencesDao preferencesDao;
 
     public DaoSession(SQLiteDatabase db, IdentityScopeType type, Map<Class<? extends AbstractDao<?, ?>>, DaoConfig>
             daoConfigMap) {
@@ -39,19 +43,31 @@ public class DaoSession extends AbstractDaoSession {
         morepacksDaoConfig = daoConfigMap.get(MorepacksDao.class).clone();
         morepacksDaoConfig.initIdentityScope(type);
 
+        logEventsDaoConfig = daoConfigMap.get(LogEventsDao.class).clone();
+        logEventsDaoConfig.initIdentityScope(type);
+
+        preferencesDaoConfig = daoConfigMap.get(PreferencesDao.class).clone();
+        preferencesDaoConfig.initIdentityScope(type);
+
         gifsDao = new GifsDao(gifsDaoConfig, this);
         stickerDao = new StickerDao(stickerDaoConfig, this);
         morepacksDao = new MorepacksDao(morepacksDaoConfig, this);
+        logEventsDao = new LogEventsDao(logEventsDaoConfig, this);
+        preferencesDao = new PreferencesDao(preferencesDaoConfig, this);
 
         registerDao(Gifs.class, gifsDao);
         registerDao(Sticker.class, stickerDao);
         registerDao(Morepacks.class, morepacksDao);
+        registerDao(LogEvents.class, logEventsDao);
+        registerDao(Preferences.class, preferencesDao);
     }
     
     public void clear() {
         gifsDaoConfig.getIdentityScope().clear();
         stickerDaoConfig.getIdentityScope().clear();
         morepacksDaoConfig.getIdentityScope().clear();
+        logEventsDaoConfig.getIdentityScope().clear();
+        preferencesDaoConfig.getIdentityScope().clear();
     }
 
     public GifsDao getGifsDao() {
@@ -64,6 +80,14 @@ public class DaoSession extends AbstractDaoSession {
 
     public MorepacksDao getMorepacksDao() {
         return morepacksDao;
+    }
+
+    public LogEventsDao getLogEventsDao() {
+        return logEventsDao;
+    }
+
+    public PreferencesDao getPreferencesDao() {
+        return preferencesDao;
     }
 
 }
