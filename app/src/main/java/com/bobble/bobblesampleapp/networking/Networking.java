@@ -120,7 +120,7 @@ public class Networking {
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        BLog.d(TAG, "storeContacts success : " + response.toString());
+                        BLog.d(TAG, "storeContacts success :" + response.toString());
                         new BobblePrefs(context).isContactsSent().put(true);
                     }
 
