@@ -16,6 +16,8 @@ import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 import com.bobble.bobblesampleapp.util.AppUtils;
 import com.bobble.bobblesampleapp.util.BLog;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
+import com.google.gson.Gson;
+
 import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
@@ -104,7 +106,9 @@ public class Networking {
      * @param params  The encrypted contacts
      */
     public static void storeContacts(final Context context, HashMap<String, String> params) {
-        BLog.d(TAG, "storeContacts");
+
+        String request=  new Gson().toJson(params);
+        BLog.d(TAG, "storeContacts"+request);
         AndroidNetworking.post(ApiEndPoint.STORE_CONTACTS)
                 .addBodyParameter(params)
                 .setTag(TAG)

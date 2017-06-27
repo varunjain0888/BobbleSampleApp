@@ -89,8 +89,9 @@
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rvMore"
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
+                    android:layout_height="190dp"
                     android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
                     />
             </LinearLayout>
         </ScrollView>

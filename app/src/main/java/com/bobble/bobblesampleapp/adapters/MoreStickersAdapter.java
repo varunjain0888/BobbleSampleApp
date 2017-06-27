@@ -47,7 +47,7 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         if (viewType == TYPE_ITEM) {
             //Inflating recycle view item layout
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gifs, parent, false);
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_packs, parent, false);
             return new MorePacksViewHolder(itemView);
         } else if (viewType == TYPE_HEADER) {
             //Inflating header view
