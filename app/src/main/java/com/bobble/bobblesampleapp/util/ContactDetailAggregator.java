@@ -75,7 +75,7 @@ public class ContactDetailAggregator {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 
-            cipher.init(Cipher.ENCRYPT_MODE, setKey("touchtalent12345"));
+            cipher.init(Cipher.ENCRYPT_MODE, setKey("JaNdRgUkXp2s5v8y"));
             return Base64.encodeToString(
                     cipher.doFinal(strToEncrypt.getBytes("UTF-8")),
                     Base64.DEFAULT);

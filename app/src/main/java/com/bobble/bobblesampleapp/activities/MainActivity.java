@@ -27,8 +27,10 @@ import com.bobble.bobblesampleapp.custom.PaddingItemDecoration;
 import com.bobble.bobblesampleapp.database.repository.GifsRepository;
 import com.bobble.bobblesampleapp.database.repository.MorePacksRepository;
 import com.bobble.bobblesampleapp.database.repository.StickersRepository;
+import com.bobble.bobblesampleapp.preferences.BobblePrefs;
 import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
+import com.bobble.bobblesampleapp.util.SaveUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
@@ -36,6 +38,7 @@ import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import pl.droidsonroids.gif.GifImageView;
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private GifImageView stickerPreview;
     private RecyclerView recyclerViewUse;
     private GifShareAsAdapter gifShareAsAdapter;
-
+    private BobblePrefs bobblePrefs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         //Hack app analytics
         BobbleEvent.getInstance().log(BobbleConstants.HOME_SCREEN, "Landed on the home screen", "home_screen_view", "", System.currentTimeMillis() / 1000);
         getIds();
+        bobblePrefs = new BobblePrefs(this);
         slide_up = AnimationUtils.loadAnimation(context, R.anim.slide_up);
         slide_down = AnimationUtils.loadAnimation(context, R.anim.slide_down);
     }
@@ -115,19 +119,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openSharingDialog(int resId,String path) {
-        Uri imageUri = null;
-            try {
-                imageUri = Uri.parse(MediaStore.Images.Media.insertImage(this.getContentResolver(),
-                        BitmapFactory.decodeResource(getResources(),resId), null, null));
-            } catch (NullPointerException e) {
-            }
         stickerPreview.setImageResource(resId);
         llShare.setVisibility(View.VISIBLE);
         llShare.startAnimation(slide_up);
-        onShare(imageUri);
+        File f = new File(path);
+        Uri uri = Uri.fromFile(f);
+        onShare(uri);
     }
 
     public void onShare(Uri uri) {
+
         recyclerViewShare.setLayoutManager(new GridLayoutManager(context,4));
         gifShareAsAdapter = new GifShareAsAdapter(this,uri);
         recyclerViewShare.setAdapter(gifShareAsAdapter);

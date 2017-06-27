@@ -25,9 +25,11 @@ import android.widget.Toast;
 import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.activities.MainActivity;
 import com.bobble.bobblesampleapp.database.Sticker;
+import com.bobble.bobblesampleapp.preferences.BobblePrefs;
 import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +52,8 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private Activity activity;
 
+    private BobblePrefs bobblePrefs;
+
     Intent sendIntent = new Intent(Intent.ACTION_SEND);
     Uri imageUri = null;
 
@@ -57,6 +61,7 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.list = horizontalList;
         this.activity =activity;
         Collections.reverse(list);
+        bobblePrefs = new BobblePrefs(activity);
     }
 
 
@@ -92,24 +97,14 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((StickerViewHolder)holder).ivfacebook.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    try {
-                        imageUri = Uri.parse(MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                BitmapFactory.decodeResource(activity.getResources(),Integer.parseInt(String.valueOf(list.get(position).getId()))), null, null));
-                    } catch (NullPointerException e) {
-                    }
-                    share(imageUri, BobbleConstants.FACEBOOK_PACKAGE_NAME,BobbleConstants.FACEBOOK_CLASS_NAME);
+                    share(list.get(position).getPath(), BobbleConstants.FACEBOOK_PACKAGE_NAME,BobbleConstants.FACEBOOK_CLASS_NAME);
                 }
             });
 
             ((StickerViewHolder)holder).ivWhatsapp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    try {
-                        imageUri = Uri.parse(MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                                BitmapFactory.decodeResource(activity.getResources(),Integer.parseInt(String.valueOf(list.get(position).getId()))), null, null));
-                    } catch (NullPointerException e) {
-                    }
-                    share(imageUri,BobbleConstants.WHATSAPP_PACKAGE_NAME,BobbleConstants.WHATSAPP_CLASS_NAME);
+                    share(list.get(position).getPath(),BobbleConstants.WHATSAPP_PACKAGE_NAME,BobbleConstants.WHATSAPP_CLASS_NAME);
                 }
             });
 
@@ -126,7 +121,9 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
         }
     }
-    void share(Uri uri,String packageName, String activityName){
+    void share(String path,String packageName, String activityName){
+        File f = new File(path);
+        Uri uri = Uri.fromFile(f);
         sendIntent.setType("image/gif");
         ComponentName name = new ComponentName(packageName,activityName);
         Log.d("", "ComponentName : " + name);

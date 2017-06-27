@@ -36,9 +36,16 @@ import com.bobble.bobblesampleapp.util.BLog;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
 import com.bobble.bobblesampleapp.util.FileUtil;
 import com.bobble.bobblesampleapp.util.HackAppWorkUtil;
+import com.bobble.bobblesampleapp.util.SaveUtils;
 import com.bobble.bobblesampleapp.util.Utils;
+import com.bobble.bobblesampleapp.util.ZipUtil;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -255,21 +262,26 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
     }
 
     private void seedAllImages() {
+        Task.callInBackground(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
                 Field[] ID_Fields = R.drawable.class.getFields();
                 for (Field f : ID_Fields) {
                     try {
                         if(f.getName().contains("sticker_original")){
                             Sticker sticker = new Sticker();
                             sticker.setStickerName(f.getName());
-                            sticker.setPath(DRAWABLE_URI_PATH+f.getName());
+                            sticker.setPath(bobblePrefs.privateDirectory().get()+"/"+f.getName()+".jpg");
                             sticker.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
                             StickersRepository.insertOrUpdate(context,sticker);
+                            SaveUtils.saveGiforJPG(context,bobblePrefs.privateDirectory().get(),getResources().getIdentifier(f.getName(), "drawable", getPackageName()),"jpg",f.getName());
                         }else if(f.getName().contains("animation_preview")){
                             Gifs gifs =new Gifs();
                             gifs.setGifName(f.getName());
-                            gifs.setPath(DRAWABLE_URI_PATH+f.getName());
+                            gifs.setPath(bobblePrefs.privateDirectory().get()+"/"+f.getName()+".gif");
                             gifs.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
                             GifsRepository.insertOrUpdate(context,gifs);
+                            SaveUtils.saveGiforJPG(context,bobblePrefs.privateDirectory().get(),getResources().getIdentifier(f.getName(), "drawable", getPackageName()),"gif",f.getName());
                         }else if(f.getName().contains("bobble_more")){
                             Morepacks morepacks = new Morepacks();
                             morepacks.setPackName(f.getName());
@@ -282,6 +294,9 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
                         e.printStackTrace();
                     }
                 }
+                return null;
+            }
+        });
     }
     void saveImagesToExternalStorage(final int resId, final String name){
         Drawable drawable = getResources().getDrawable(resId);
@@ -383,6 +398,31 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
         },Task.UI_THREAD_EXECUTOR);
 
     }
+
+
+
+
+
+    private void seedBobbleAnimationPacks() {
+            BobblePrefs prefs = new BobblePrefs(context);
+            String zipFile = prefs.privateDirectory().get() + File.separator + "resources" + File.separator + "animation_pack_seed.zip";
+            String unzipPath = prefs.privateDirectory().get() + File.separator + "resources";
+            if (!FileUtil.isFilePresent(context, zipFile)) {
+                SaveUtils.copyAssets("animation_pack_seed.zip", unzipPath, context);
+            }
+            boolean zipSuccessful = ZipUtil.unzip(zipFile, unzipPath);
+            if (zipSuccessful) {
+                String folderPath = prefs.privateDirectory().get() + File.separator + "resources" + File.separator + "animation_pack_seed";
+                String sourcePath1 = folderPath + File.separator + "accessories";
+                String sourcePath2 = folderPath + File.separator + "bobbleAnimationPack";
+                FileUtil.move(sourcePath1, unzipPath + File.separator + "accessories", true);
+                FileUtil.move(sourcePath2, unzipPath + File.separator + "bobbleAnimationPack", true);
+                String animationFolder = prefs.privateDirectory().get() + File.separator + "resources" + File.separator + "bobbleAnimationPack";
+
+            }
+        }
+
+
 
 
 }

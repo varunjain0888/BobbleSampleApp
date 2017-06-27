@@ -64,7 +64,7 @@ public class Networking {
             params.put("userId", bobblePrefs.userId().get());
         }
         params.put("deviceLanguage", Locale.getDefault().toString());
-        params.put("phoneNumber", "8585949830");
+       // params.put("phoneNumber", "8585949830");
         try {
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             String phoneNumber = telephonyManager.getLine1Number();
