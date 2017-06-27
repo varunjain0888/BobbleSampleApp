@@ -49,4 +49,5 @@ dependencies {
     debugCompile "com.amitshekhar.android:debug-db:$rootProject.androidDatabasedebugVersion"
     compile "com.amitshekhar.android:android-networking:$rootProject.androidNetworking"
     compile "de.greenrobot:eventbus:$rootProject.eventbusVersion"
+    compile project(path: ':androidViewPagerIndicator')
 }

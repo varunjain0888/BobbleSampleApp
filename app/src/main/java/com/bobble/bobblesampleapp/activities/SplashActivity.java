@@ -361,27 +361,4 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
         },Task.UI_THREAD_EXECUTOR);
 
     }
-
-    private void seedBobbleAnimationPacks() {
-            BobblePrefs prefs = new BobblePrefs(context);
-            String zipFile = prefs.privateDirectory().get() + File.separator + "resources" + File.separator + "animation_pack_seed.zip";
-            String unzipPath = prefs.privateDirectory().get() + File.separator + "resources";
-            if (!FileUtil.isFilePresent(context, zipFile)) {
-                SaveUtils.copyAssets("animation_pack_seed.zip", unzipPath, context);
-            }
-            boolean zipSuccessful = ZipUtil.unzip(zipFile, unzipPath);
-            if (zipSuccessful) {
-                String folderPath = prefs.privateDirectory().get() + File.separator + "resources" + File.separator + "animation_pack_seed";
-                String sourcePath1 = folderPath + File.separator + "accessories";
-                String sourcePath2 = folderPath + File.separator + "bobbleAnimationPack";
-                FileUtil.move(sourcePath1, unzipPath + File.separator + "accessories", true);
-                FileUtil.move(sourcePath2, unzipPath + File.separator + "bobbleAnimationPack", true);
-                String animationFolder = prefs.privateDirectory().get() + File.separator + "resources" + File.separator + "bobbleAnimationPack";
-
-            }
-        }
-
-
-
-
 }

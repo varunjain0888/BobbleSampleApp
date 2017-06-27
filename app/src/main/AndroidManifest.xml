@@ -16,9 +16,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_static_logo"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_static_logo"
+        android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".BobbleSampleApp">
@@ -35,6 +35,11 @@
         <activity android:name=".activities.MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="portrait"/>
+        <activity android:name=".activities.AdBoardActivity"
+            android:theme="@style/Theme.Transparent"
+            android:screenOrientation="portrait"
+            android:label=""
+            />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

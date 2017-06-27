@@ -1,5 +1,6 @@
 package com.bobble.bobblesampleapp.adapters;
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bobble.bobblesampleapp.R;
+import com.bobble.bobblesampleapp.activities.AdBoardActivity;
 import com.bobble.bobblesampleapp.activities.MainActivity;
 import com.bobble.bobblesampleapp.database.Morepacks;
 
@@ -61,13 +63,15 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
         if (holder instanceof MorePacksViewHolder){
             ((MorePacksViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //((MainActivity)activity).openSharingDialog(0);
+                    Intent intent = new Intent(activity, AdBoardActivity.class);
+                    intent.putExtra("position",position);
+                    activity.startActivity(intent);
                 }
             });
             ((MorePacksViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));

@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -63,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerViewUse;
     private GifShareAsAdapter gifShareAsAdapter;
     private BobblePrefs bobblePrefs;
+    private ImageView ivGoogleplaystore;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         rvSticker = (RecyclerView) findViewById(R.id.rvSticker);
         recyclerViewShare = (RecyclerView) findViewById(R.id.recyclerViewShare);
         recyclerViewUse = (RecyclerView) findViewById(R.id.recyclerViewUse);
-
+        ivGoogleplaystore = (ImageView) findViewById(R.id.ivGoogleplaystore);
 
         mgifLayoutManager = new LinearLayoutManager(getApplicationContext(), GridLayoutManager.HORIZONTAL, false);
         mstickerLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -110,6 +113,15 @@ public class MainActivity extends AppCompatActivity {
         rvGifs.addItemDecoration(new PaddingItemDecoration(50));
         rvSticker.addItemDecoration(new PaddingItemDecoration(50));
         rvMore.addItemDecoration(new PaddingItemDecoration(50));
+
+        ivGoogleplaystore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(android.content.Intent.ACTION_VIEW);
+                i.setData(Uri.parse(BobbleConstants.GOOGLE_PLAY_STORE_LINK_TO_BOOBLE));
+                startActivity(i);
+            }
+        });
 
     }
 
