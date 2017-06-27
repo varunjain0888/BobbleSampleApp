@@ -41,6 +41,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import java.io.File;
 import java.util.ArrayList;
 
+import de.greenrobot.event.EventBus;
 import pl.droidsonroids.gif.GifImageView;
 
 public class MainActivity extends AppCompatActivity {
@@ -94,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
         rvSticker.setLayoutManager(mstickerLayoutManager);
         rvMore.setLayoutManager(mMoreLayoutManager);
 
-
         gifsAdapter = new GifsAdapter(this, GifsRepository.getAllGifs(context));
         rvGifs.setAdapter(gifsAdapter);
 
@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
         llShare.setVisibility(View.VISIBLE);
         llShare.startAnimation(slide_up);
     }
-
 
     @Override
     public void onBackPressed() {

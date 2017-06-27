@@ -101,59 +101,66 @@ public class SaveUtils {
             out.write(buffer, 0, read);
         }
     }
-    public static void saveGiforJPG(Context context,String path,int resId,String type,String name)
+    public static void saveGiforJPG(final Context context, final String path, final int resId, final String type, final String name)
     {
-        try
-        {    File file = null;
-            if(type.equalsIgnoreCase("gif")){
-                file = new File(path,name+ ".gif");
-            }else if(type.equalsIgnoreCase("jpg")){
-                file = new File(path,name+ ".jpg");
-            }else if(type.equalsIgnoreCase("png")){
-                file = new File(path,name+ ".png");
-            }else if(type.equalsIgnoreCase("jpeg")){
-                file = new File(path,name+ ".jpeg");
+        Task.callInBackground(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                try
+                {    File file = null;
+                    if(type.equalsIgnoreCase("gif")){
+                        file = new File(path,name+ ".gif");
+                    }else if(type.equalsIgnoreCase("jpg")){
+                        file = new File(path,name+ ".jpg");
+                    }else if(type.equalsIgnoreCase("png")){
+                        file = new File(path,name+ ".png");
+                    }else if(type.equalsIgnoreCase("jpeg")){
+                        file = new File(path,name+ ".jpeg");
+                    }
+
+
+                    long startTime = System.currentTimeMillis();
+
+                    BLog.d(TAG, "on do in background, url open connection");
+
+                    InputStream is = context.getResources().openRawResource(resId);
+                    BLog.d(TAG, "on do in background, url get input stream");
+                    BufferedInputStream bis = new BufferedInputStream(is);
+                    BLog.d(TAG, "on do in background, create buffered input stream");
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    BLog.d(TAG, "on do in background, create buffered array output stream");
+
+                    byte[] img = new byte[1024];
+
+                    int current = 0;
+
+                    BLog.d(TAG, "on do in background, write byte to baos");
+                    while ((current = bis.read()) != -1) {
+                        baos.write(current);
+                    }
+
+
+                    BLog.d(TAG, "on do in background, done write");
+
+                    BLog.d(TAG, "on do in background, create fos");
+                    FileOutputStream fos = new FileOutputStream(file);
+                    fos.write(baos.toByteArray());
+
+                    BLog.d(TAG, "on do in background, write to fos");
+                    fos.flush();
+
+                    fos.close();
+                    is.close();
+                    BLog.d(TAG, "on do in background, done write to fos");
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
+        });
 
-
-            long startTime = System.currentTimeMillis();
-
-            BLog.d(TAG, "on do in background, url open connection");
-
-            InputStream is = context.getResources().openRawResource(resId);
-            BLog.d(TAG, "on do in background, url get input stream");
-            BufferedInputStream bis = new BufferedInputStream(is);
-            BLog.d(TAG, "on do in background, create buffered input stream");
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            BLog.d(TAG, "on do in background, create buffered array output stream");
-
-            byte[] img = new byte[1024];
-
-            int current = 0;
-
-            BLog.d(TAG, "on do in background, write byte to baos");
-            while ((current = bis.read()) != -1) {
-                baos.write(current);
-            }
-
-
-            BLog.d(TAG, "on do in background, done write");
-
-            BLog.d(TAG, "on do in background, create fos");
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(baos.toByteArray());
-
-            BLog.d(TAG, "on do in background, write to fos");
-            fos.flush();
-
-            fos.close();
-            is.close();
-            BLog.d(TAG, "on do in background, done write to fos");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 }

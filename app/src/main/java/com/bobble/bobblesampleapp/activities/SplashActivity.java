@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import bolts.Task;
+import de.greenrobot.event.EventBus;
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 
@@ -262,9 +263,6 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
     }
 
     private void seedAllImages() {
-        Task.callInBackground(new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
                 Field[] ID_Fields = R.drawable.class.getFields();
                 for (Field f : ID_Fields) {
                     try {
@@ -294,28 +292,7 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
                         e.printStackTrace();
                     }
                 }
-                return null;
             }
-        });
-    }
-    void saveImagesToExternalStorage(final int resId, final String name){
-        Drawable drawable = getResources().getDrawable(resId);
-
-        Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 60, bytearrayoutputstream);
-        File file = new File(bobblePrefs.privateDirectory().get() + "/"+name);
-        try
-        {
-            file.createNewFile();
-            FileOutputStream fileoutputstream = new FileOutputStream(file);
-
-            fileoutputstream.write(bytearrayoutputstream.toByteArray());
-            fileoutputstream.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     private void createBobbleDirectory(String storageType) {
 
@@ -372,20 +349,6 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
         }
     }
 
-    private void requestExternalStoragePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            BLog.i("test",
-                    "Displaying external storage permission rationale to provide additional context.");
-
-            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQUEST_CODE);
-
-        } else {
-            // External Storage permission has not been granted yet. Request it directly without rationale.
-            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQUEST_CODE);
-        }
-    }
-
     void openNextActivity() {
         Task.call(new Callable<Object>() {
             @Override
@@ -398,10 +361,6 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
         },Task.UI_THREAD_EXECUTOR);
 
     }
-
-
-
-
 
     private void seedBobbleAnimationPacks() {
             BobblePrefs prefs = new BobblePrefs(context);
