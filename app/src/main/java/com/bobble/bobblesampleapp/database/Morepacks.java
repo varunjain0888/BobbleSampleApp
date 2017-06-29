@@ -9,6 +9,7 @@ public class Morepacks {
     private long id;
     private String packName;
     private String path;
+    private Boolean isAd;
 
     public Morepacks() {
     }
@@ -17,10 +18,11 @@ public class Morepacks {
         this.id = id;
     }
 
-    public Morepacks(long id, String packName, String path) {
+    public Morepacks(long id, String packName, String path, Boolean isAd) {
         this.id = id;
         this.packName = packName;
         this.path = path;
+        this.isAd = isAd;
     }
 
     public long getId() {
@@ -45,6 +47,14 @@ public class Morepacks {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Boolean getIsAd() {
+        return isAd;
+    }
+
+    public void setIsAd(Boolean isAd) {
+        this.isAd = isAd;
     }
 
 }

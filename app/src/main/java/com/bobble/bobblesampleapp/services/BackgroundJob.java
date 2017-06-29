@@ -2,19 +2,15 @@ package com.bobble.bobblesampleapp.services;
 
 import android.support.annotation.NonNull;
 
-import com.bobble.bobblesampleapp.database.Preferences;
-import com.bobble.bobblesampleapp.database.repository.PreferencesRepository;
 import com.bobble.bobblesampleapp.networking.Networking;
 import com.bobble.bobblesampleapp.preferences.BobblePrefs;
 import com.bobble.bobblesampleapp.util.AppUtils;
 import com.bobble.bobblesampleapp.util.BLog;
-import com.bobble.bobblesampleapp.util.BobbleConstants;
-import com.bobble.bobblesampleapp.util.HackAppWorkUtil;
+import com.bobble.bobblesampleapp.util.GrowthAppWorkUtil;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobRequest;
 
 import java.util.concurrent.TimeUnit;
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by aamir on 14/12/16.
@@ -33,13 +29,13 @@ public class BackgroundJob extends Job {
         try {
             if (AppUtils.isAppIsInBackground(getContext())) {
                 BLog.d(TAG, "xxmm: Running Job........ "+params.getId());
-                HackAppWorkUtil.logEventsToServer(getContext());
+                GrowthAppWorkUtil.logEventsToServer(getContext());
                 if (!new BobblePrefs(getContext()).isRegistered().get()) {
                     Networking.registerUser(getContext(), false);
                 }
-            } else {
+            } /*else {
                 EventBus.getDefault().post("connectivityReceiver");
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
             return Result.FAILURE;

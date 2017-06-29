@@ -9,6 +9,7 @@ public class Gifs {
     private long id;
     private String gifName;
     private String path;
+    private Boolean isAd;
 
     public Gifs() {
     }
@@ -17,10 +18,11 @@ public class Gifs {
         this.id = id;
     }
 
-    public Gifs(long id, String gifName, String path) {
+    public Gifs(long id, String gifName, String path, Boolean isAd) {
         this.id = id;
         this.gifName = gifName;
         this.path = path;
+        this.isAd = isAd;
     }
 
     public long getId() {
@@ -45,6 +47,14 @@ public class Gifs {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Boolean getIsAd() {
+        return isAd;
+    }
+
+    public void setIsAd(Boolean isAd) {
+        this.isAd = isAd;
     }
 
 }

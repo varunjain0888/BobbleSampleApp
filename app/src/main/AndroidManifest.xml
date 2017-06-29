@@ -34,7 +34,8 @@
         </activity>
         <activity android:name=".activities.MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            />
         <activity android:name=".activities.AdBoardActivity"
             android:theme="@style/Theme.Transparent"
             android:screenOrientation="portrait"

@@ -17,8 +17,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bobble.bobblesampleapp.R;
+import com.bobble.bobblesampleapp.activities.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +38,11 @@ public class GifShareAsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     protected List<ResolveInfo> list = new ArrayList<>();
     protected PackageManager pm;
     private Uri finalUri;
-    public GifShareAsAdapter(Activity context,Uri finalUri) {
+    private String type;
+    public GifShareAsAdapter(Activity context,Uri finalUri,String type) {
         this.context = context;
         this.finalUri = finalUri;
+        this.type = type;
         pm = context.getPackageManager();
         sendIntent.setType("image/gif");
         list = pm.queryIntentActivities(sendIntent, 0);
@@ -154,14 +158,24 @@ public class GifShareAsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 ComponentName name = new ComponentName(activity.applicationInfo.packageName, activity.name);
                 Log.d(TAG, "ComponentName : " + name);
                 Uri shareableUri = finalUri;
+
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.addCategory(Intent.CATEGORY_LAUNCHER);
                 shareIntent.setType("image/gif");
                 shareIntent.putExtra(Intent.EXTRA_STREAM, shareableUri);
-                shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
+                //shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 shareIntent.setComponent(name);
-                context.startActivity(shareIntent);
+                if(shareIntent!=null){
+                    if(type.equalsIgnoreCase("gif")){
+                        context.startActivityForResult(shareIntent, MainActivity.GIF_POPUP__SUCCESS);
+                    }else{
+                        context.startActivityForResult(shareIntent, MainActivity.STICKER_POPUP_SUCCESS);
+                    }
+
+                }else{
+                    Toast.makeText(context,"Application not found",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

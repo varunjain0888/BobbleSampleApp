@@ -9,6 +9,7 @@ public class Sticker {
     private long id;
     private String stickerName;
     private String path;
+    private Boolean isAd;
 
     public Sticker() {
     }
@@ -17,10 +18,11 @@ public class Sticker {
         this.id = id;
     }
 
-    public Sticker(long id, String stickerName, String path) {
+    public Sticker(long id, String stickerName, String path, Boolean isAd) {
         this.id = id;
         this.stickerName = stickerName;
         this.path = path;
+        this.isAd = isAd;
     }
 
     public long getId() {
@@ -45,6 +47,14 @@ public class Sticker {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Boolean getIsAd() {
+        return isAd;
+    }
+
+    public void setIsAd(Boolean isAd) {
+        this.isAd = isAd;
     }
 
 }

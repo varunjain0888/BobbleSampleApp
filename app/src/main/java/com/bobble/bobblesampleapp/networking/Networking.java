@@ -68,7 +68,12 @@ public class Networking {
         try {
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             String phoneNumber = telephonyManager.getLine1Number();
-            params.put("phoneNumber", phoneNumber);
+            if(phoneNumber!=null){
+                params.put("phoneNumber", phoneNumber);
+            }else{
+                params.put("phoneNumber", "123456789");
+            }
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }

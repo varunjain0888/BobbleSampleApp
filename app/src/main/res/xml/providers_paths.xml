@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <external-path
-        name="bobble_external_files"
-        path="bobblesample/" />
+    <external-path path="bobblesample/" name="files_root" />
+
+    <external-path path="bobblesample/" name="external_storage_root" />
+
+
     <files-paths
         name="bobble_internal_sticker"
         path="bobblesample/" />
+
 </paths>

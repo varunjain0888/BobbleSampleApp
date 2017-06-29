@@ -56,7 +56,10 @@ public class SuccessResponseParseUtil {
     public static void handleRegisterUserResponse(final Context context, final BobblePrefs bobblePrefs, final boolean forBranchReferral, final JSONObject response) {
         try {
             bobblePrefs.isRegistered().put(true);
-            bobblePrefs.userId().put(response.getString("userId"));
+            if(response.getString("userId")!=null){
+                bobblePrefs.userId().put(response.getString("userId"));
+            }
+
             bobblePrefs.lastInvitePopupTime().put(Calendar.getInstance().getTimeInMillis());
             if (!forBranchReferral && !bobblePrefs.utmCampaign().get().isEmpty()) {
                 bobblePrefs.isWorkDoneForReferral().put(true);

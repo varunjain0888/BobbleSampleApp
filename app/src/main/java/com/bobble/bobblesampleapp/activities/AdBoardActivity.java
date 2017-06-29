@@ -22,11 +22,12 @@ import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.database.Morepacks;
 import com.bobble.bobblesampleapp.database.repository.MorePacksRepository;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.Collections;
 import java.util.List;
+
+import pl.droidsonroids.gif.GifImageView;
 
 /**
  * Created by varunjain on 6/27/17.
@@ -71,7 +72,7 @@ public class AdBoardActivity extends AppCompatActivity {
         public AdBoardPagerAdapter(Context context, List<Morepacks> list) {
             this.context = context;
             this.list = list;
-            Collections.reverse(list);
+            //Collections.reverse(list);
         }
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
@@ -90,8 +91,17 @@ public class AdBoardActivity extends AppCompatActivity {
                 });
             }else{
                 v = layoutInflater.inflate(R.layout.item_adboard_pager, null);
-                SimpleDraweeView imageView = (SimpleDraweeView)v.findViewById(R.id.imageView);
+                GifImageView imageView = (GifImageView)v.findViewById(R.id.imageView);
                 imageView.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
+                ImageView imageView1 = (ImageView)v.findViewById(R.id.ivGoogleplaystore);
+                imageView1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(android.content.Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(BobbleConstants.GOOGLE_PLAY_STORE_LINK_TO_BOOBLE));
+                        startActivity(i);
+                    }
+                });
             }
             container.addView(v);
             return v;

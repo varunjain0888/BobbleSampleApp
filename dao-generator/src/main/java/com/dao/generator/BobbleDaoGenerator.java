@@ -26,16 +26,19 @@ public class BobbleDaoGenerator {
         gifs.addLongProperty("id").primaryKey().notNull();
         gifs.addStringProperty("gifName");
         gifs.addStringProperty("path");
+        gifs.addBooleanProperty("isAd");
 
         Entity sticker = schema.addEntity("Sticker");
         sticker.addLongProperty("id").primaryKey().notNull();
         sticker.addStringProperty("stickerName");
         sticker.addStringProperty("path");
+        sticker.addBooleanProperty("isAd");
 
         Entity more = schema.addEntity("Morepacks");
         more.addLongProperty("id").primaryKey().notNull();
         more.addStringProperty("packName");
         more.addStringProperty("path");
+        more.addBooleanProperty("isAd");
 
         Entity logEvents = schema.addEntity("LogEvents");
         logEvents.addIdProperty();

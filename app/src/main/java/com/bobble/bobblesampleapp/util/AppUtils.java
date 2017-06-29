@@ -15,9 +15,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.bobble.bobblesampleapp.preferences.BobblePrefs;
-import com.facebook.device.yearclass.YearClass;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -102,7 +102,7 @@ public final class AppUtils {
         }
 
         try {
-            params.put("YearClass", String.valueOf(YearClass.get(context)));
+            params.put("YearClass", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
         } catch (Exception e) {
             e.printStackTrace();
         }

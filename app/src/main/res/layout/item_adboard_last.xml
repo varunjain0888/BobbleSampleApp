@@ -30,7 +30,7 @@
         android:id="@+id/ivGoogleplaystore"
         android:layout_width="186dp"
         android:layout_height="55dp"
-        android:background="@drawable/bitmap_copy"
+        android:background="@drawable/get_it_on_google_play_button"
         android:layout_centerInParent="true"
         />
     </RelativeLayout>

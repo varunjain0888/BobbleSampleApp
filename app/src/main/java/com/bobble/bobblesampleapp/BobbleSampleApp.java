@@ -2,6 +2,7 @@ package com.bobble.bobblesampleapp;
 
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.StrictMode;
 
 import com.androidnetworking.AndroidNetworking;
 import com.bobble.bobblesampleapp.database.DaoMaster;
@@ -11,17 +12,15 @@ import com.bobble.bobblesampleapp.services.BackgroundJobCreator;
 import com.bobble.bobblesampleapp.util.AppUtils;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
 import com.evernote.android.job.JobManager;
-import com.facebook.drawee.backends.pipeline.Fresco;
 
 import co.tmobi.Skydive;
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+
 
 /**
  * Created by varunjain on 6/23/17.
  */
 
 public class BobbleSampleApp extends Application {
-    CalligraphyConfig mCalligraphyConfig;
     private static BobbleSampleApp appInstance;
     private DaoSession daoSession;
 
@@ -30,8 +29,6 @@ public class BobbleSampleApp extends Application {
     public void onCreate() {
         super.onCreate();
         appInstance = this;
-        CalligraphyConfig.initDefault(mCalligraphyConfig);
-        Fresco.initialize(getApplicationContext());
         AndroidNetworking.initialize(getApplicationContext());
         JobManager.create(getApplicationContext()).addJobCreator(new BackgroundJobCreator()); // initialising JobManger
         BobblePrefs bobblePrefs = new BobblePrefs(this);
@@ -50,6 +47,7 @@ public class BobbleSampleApp extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     public void setupDatabase() {

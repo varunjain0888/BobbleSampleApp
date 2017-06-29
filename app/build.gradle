@@ -27,27 +27,13 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
     compile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     compile "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
     compile "com.android.support:design:$rootProject.supportLibraryVersion"
     compile "pl.droidsonroids.gif:android-gif-drawable:$rootProject.gifDrawable"
-    compile "com.android.support.constraint:constraint-layout:$rootProject.constraintLayoutVersion"
-    // font
-    compile "uk.co.chrisjenx:calligraphy:$rootProject.calligraphyVersion"
-    testCompile "junit:junit:$rootProject.jUnitVersion"
     compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-
-    compile "com.facebook.fresco:animated-base-support:$rootProject.frescoBaseVersion"
-    compile "com.facebook.device.yearclass:yearclass:$rootProject.facebookyearclass"
-    compile "com.facebook.fresco:animated-gif:$rootProject.frescoBaseVersion"
-    compile "com.facebook.fresco:fresco:$rootProject.frescoVersion"
     compile "de.greenrobot:greendao:$rootProject.greenDaoVersion"
-    debugCompile "com.amitshekhar.android:debug-db:$rootProject.androidDatabasedebugVersion"
     compile "com.amitshekhar.android:android-networking:$rootProject.androidNetworking"
-    compile "de.greenrobot:eventbus:$rootProject.eventbusVersion"
     compile project(path: ':androidViewPagerIndicator')
+    compile 'com.parse.bolts:bolts-tasks:1.4.0'
 }

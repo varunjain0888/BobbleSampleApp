@@ -25,6 +25,7 @@ public class GifsDao extends AbstractDao<Gifs, Long> {
         public final static Property Id = new Property(0, long.class, "id", true, "ID");
         public final static Property GifName = new Property(1, String.class, "gifName", false, "GIF_NAME");
         public final static Property Path = new Property(2, String.class, "path", false, "PATH");
+        public final static Property IsAd = new Property(3, Boolean.class, "isAd", false, "IS_AD");
     };
 
 
@@ -42,7 +43,8 @@ public class GifsDao extends AbstractDao<Gifs, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"GIFS\" (" + //
                 "\"ID\" INTEGER PRIMARY KEY NOT NULL ," + // 0: id
                 "\"GIF_NAME\" TEXT," + // 1: gifName
-                "\"PATH\" TEXT);"); // 2: path
+                "\"PATH\" TEXT," + // 2: path
+                "\"IS_AD\" INTEGER);"); // 3: isAd
     }
 
     /** Drops the underlying database table. */
@@ -66,6 +68,11 @@ public class GifsDao extends AbstractDao<Gifs, Long> {
         if (path != null) {
             stmt.bindString(3, path);
         }
+ 
+        Boolean isAd = entity.getIsAd();
+        if (isAd != null) {
+            stmt.bindLong(4, isAd ? 1L: 0L);
+        }
     }
 
     /** @inheritdoc */
@@ -80,7 +87,8 @@ public class GifsDao extends AbstractDao<Gifs, Long> {
         Gifs entity = new Gifs( //
             cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // gifName
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // path
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // path
+            cursor.isNull(offset + 3) ? null : cursor.getShort(offset + 3) != 0 // isAd
         );
         return entity;
     }
@@ -91,6 +99,7 @@ public class GifsDao extends AbstractDao<Gifs, Long> {
         entity.setId(cursor.getLong(offset + 0));
         entity.setGifName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setPath(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setIsAd(cursor.isNull(offset + 3) ? null : cursor.getShort(offset + 3) != 0);
      }
     
     /** @inheritdoc */

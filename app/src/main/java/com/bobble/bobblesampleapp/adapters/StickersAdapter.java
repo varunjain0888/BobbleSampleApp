@@ -10,9 +10,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.IntentCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +27,7 @@ import android.widget.Toast;
 
 import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.activities.MainActivity;
+import com.bobble.bobblesampleapp.database.Gifs;
 import com.bobble.bobblesampleapp.database.Sticker;
 import com.bobble.bobblesampleapp.preferences.BobblePrefs;
 import com.bobble.bobblesampleapp.singletons.BobbleEvent;
@@ -32,6 +36,7 @@ import com.bobble.bobblesampleapp.util.BobbleConstants;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import pl.droidsonroids.gif.GifImageView;
@@ -60,8 +65,25 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public StickersAdapter(final Activity activity, List<Sticker> horizontalList) {
         this.list = horizontalList;
         this.activity =activity;
-        Collections.reverse(list);
+        //Sorting array according to required sequence
+
+        for(int i = 0; i<list.size();i++){
+            String name = list.get(i).getStickerName().substring(8);
+            list.get(i).setStickerName(name);
+        }
+        Collections.sort(list, new Comparator<Sticker>() {
+            @Override
+            public int compare(Sticker o1, Sticker o2) {
+
+                return Integer.parseInt(o1.getStickerName())-Integer.parseInt(o2.getStickerName());
+            }
+        });
         bobblePrefs = new BobblePrefs(activity);
+        for (int i = 0; i < list.size()+1; i++) {
+            if((i+1 )% 5 ==0 && i!=5){
+                list.add(i,new Sticker());
+            }
+        }
     }
 
 
@@ -89,7 +111,10 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((StickersAdapter.StickerViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())),list.get(position).getPath());
+                    //Bobble analytics
+                    BobbleEvent.getInstance().log("Home Screen","Tap on sticker","tap_on_sticker",list.get(position).getStickerName(),System.currentTimeMillis()/1000);
+
+                    ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())),list.get(position).getPath(),"sticker");
                 }
             });
             ((StickersAdapter.StickerViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
@@ -123,18 +148,39 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
     void share(String path,String packageName, String activityName){
         File f = new File(path);
-        Uri uri = Uri.fromFile(f);
+
+        Uri uri =null;
+
+
+        File newFile = new File(path);
+
+        uri = FileProvider.getUriForFile(activity, "com.bobble.bobblesampleapp.fileprovider", newFile);
+
+       /* if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            uri = Uri.fromFile(f);
+        }*/
+
+        PackageManager pm=activity.getPackageManager();
+        try{
         sendIntent.setType("image/gif");
         ComponentName name = new ComponentName(packageName,activityName);
         Log.d("", "ComponentName : " + name);
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            PackageInfo info=pm.getPackageInfo("com.whatsapp", PackageManager.GET_META_DATA);
         shareIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         shareIntent.setType("image/gif");
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
+        shareIntent.setFlags(IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         shareIntent.setComponent(name);
-        activity.startActivity(shareIntent);
+            if(packageName.contains("whatsapp")){
+                activity.startActivityForResult(shareIntent, MainActivity.STICKER_WHATSAPP_SUCCESS);
+            }else{
+                activity.startActivityForResult(shareIntent, MainActivity.STICKER_FACEBOOK_SUCCESS);
+            }
+        }catch(PackageManager.NameNotFoundException e){
+            Toast.makeText(activity,"Application not found",Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -144,12 +190,10 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
+        if(list.get(position)!=null && !TextUtils.isEmpty(list.get(position).getStickerName())){
             return TYPE_ITEM;
-        } else if (position == list.size()-1) {
-            return TYPE_FOOTER;
         }
-        return TYPE_ITEM;
+        return TYPE_FOOTER;
     }
 
     public class StickerViewHolder extends RecyclerView.ViewHolder {

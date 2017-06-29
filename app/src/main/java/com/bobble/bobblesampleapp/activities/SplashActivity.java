@@ -5,10 +5,8 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,8 +15,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.bobble.bobblesampleapp.BobbleSampleApp;
 import com.bobble.bobblesampleapp.R;
@@ -32,24 +31,17 @@ import com.bobble.bobblesampleapp.database.repository.PreferencesRepository;
 import com.bobble.bobblesampleapp.database.repository.StickersRepository;
 import com.bobble.bobblesampleapp.preferences.BobblePrefs;
 import com.bobble.bobblesampleapp.services.BackgroundJob;
+import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 import com.bobble.bobblesampleapp.util.BLog;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
 import com.bobble.bobblesampleapp.util.FileUtil;
-import com.bobble.bobblesampleapp.util.HackAppWorkUtil;
+import com.bobble.bobblesampleapp.util.GrowthAppWorkUtil;
 import com.bobble.bobblesampleapp.util.SaveUtils;
-import com.bobble.bobblesampleapp.util.Utils;
-import com.bobble.bobblesampleapp.util.ZipUtil;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -57,7 +49,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import bolts.Task;
-import de.greenrobot.event.EventBus;
+
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
 
@@ -101,9 +93,9 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
         bobblePrefs.deviceWidth().put(size.x);
         bobblePrefs.screenHeight().put(size.y);
         bobblePrefs.screenWidth().put(size.x);
-        if (bobblePrefs.appOpenedCount().get() == 0) {
+       /* if (bobblePrefs.appOpenedCount().get() == 0) {
             FileUtil.delete(bobblePrefs.privateDirectory().get() + File.separator + "resources" + File.separator + "bobbleAnimations");
-        }
+        }*/
 
         //TODO NOT IN USE STATIC BLOCK BUT REQUIRED IN FUTURE
         {
@@ -140,12 +132,12 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
                     createBobbleDirectory(CREATE_EXTERNAL_DIRECTORY);
                     seedPrefrences();
                     seedAllImages();
-                    HackAppWorkUtil.processAppStartUpWork(getApplicationContext());
                 }
             }
         }
         //Schedule a job for background user registration and log events to server
         scheduleABackgroundJob();
+
         try {
             if (!bobblePrefs.disableSimilarWebSDK().get()) {
                 ((BobbleSampleApp) getApplicationContext()).initialiseSimilarWeb();
@@ -159,8 +151,13 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
             @Override
             public void run() {
                 requestPermission();
+                //Bobble analytics
+                BobbleEvent.getInstance().log("Splash Screen","Splash time","splash_time",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
             }
         },SPLASH_SCREEN_DELAY);
+        //Bobble analytics
+        BobbleEvent.getInstance().log("Splash Screen","App launch","splash_launch","",System.currentTimeMillis()/1000);
+
     }
 
     private void seedPrefrences() {
@@ -182,9 +179,11 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
                 BLog.e(TAG, "inside contact permission");
                 requestContactsPermission();
             }else{
+                GrowthAppWorkUtil.processAppStartUpWork(getApplicationContext());
                 openNextActivity();
             }
         }else{
+            GrowthAppWorkUtil.processAppStartUpWork(getApplicationContext());
             openNextActivity();
         }
     }
@@ -209,11 +208,11 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
             // For example if the user has previously denied the permission.
             BLog.i("test",
                     "Displaying external storage permission rationale to provide additional context.");
-            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.GET_ACCOUNTS,Manifest.permission.READ_CONTACTS,Manifest.permission.WRITE_EXTERNAL_STORAGE}, CONTACTS_REQUEST_CODE);
+            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.GET_ACCOUNTS,Manifest.permission.READ_CONTACTS,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE}, CONTACTS_REQUEST_CODE);
 
         } else {
             // External Storage permission has not been granted yet. Request it directly without rationale.
-            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.GET_ACCOUNTS,Manifest.permission.READ_CONTACTS,Manifest.permission.WRITE_EXTERNAL_STORAGE}, CONTACTS_REQUEST_CODE);
+            ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.GET_ACCOUNTS,Manifest.permission.READ_CONTACTS,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE}, CONTACTS_REQUEST_CODE);
 
         }
 
@@ -247,13 +246,14 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
                 return;
             }
             BLog.i("test", "Received response for contact permission request.");
-            if (grantResults.length == 3 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                    && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length == 4 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[2] == PackageManager.PERMISSION_GRANTED&& grantResults[3] == PackageManager.PERMISSION_GRANTED) {
+                GrowthAppWorkUtil.processAppStartUpWork(getApplicationContext());
                 createBobbleDirectory(CREATE_EXTERNAL_DIRECTORY);
                 seedAllImages();
                 openNextActivity();
-            } else if (grantResults.length == 3 && grantResults[0] == PackageManager.PERMISSION_DENIED || grantResults[1] == PackageManager.PERMISSION_DENIED
-                    || grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+            } else if (grantResults.length == 4 && grantResults[0] == PackageManager.PERMISSION_DENIED || grantResults[1] == PackageManager.PERMISSION_DENIED
+                    || grantResults[2] == PackageManager.PERMISSION_GRANTED&& grantResults[3] == PackageManager.PERMISSION_GRANTED) {
                 seedAllImages();
                 openNextActivity();
             }
@@ -264,35 +264,43 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
 
     private void seedAllImages() {
                 Field[] ID_Fields = R.drawable.class.getFields();
-                for (Field f : ID_Fields) {
-                    try {
-                        if(f.getName().contains("sticker_original")){
-                            Sticker sticker = new Sticker();
-                            sticker.setStickerName(f.getName());
-                            sticker.setPath(bobblePrefs.privateDirectory().get()+"/"+f.getName()+".jpg");
-                            sticker.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
-                            StickersRepository.insertOrUpdate(context,sticker);
-                            SaveUtils.saveGiforJPG(context,bobblePrefs.privateDirectory().get(),getResources().getIdentifier(f.getName(), "drawable", getPackageName()),"jpg",f.getName());
-                        }else if(f.getName().contains("animation_preview")){
-                            Gifs gifs =new Gifs();
-                            gifs.setGifName(f.getName());
-                            gifs.setPath(bobblePrefs.privateDirectory().get()+"/"+f.getName()+".gif");
-                            gifs.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
-                            GifsRepository.insertOrUpdate(context,gifs);
-                            SaveUtils.saveGiforJPG(context,bobblePrefs.privateDirectory().get(),getResources().getIdentifier(f.getName(), "drawable", getPackageName()),"gif",f.getName());
-                        }else if(f.getName().contains("bobble_more")){
-                            Morepacks morepacks = new Morepacks();
-                            morepacks.setPackName(f.getName());
-                            morepacks.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
-                            MorePacksRepository.insertOrUpdate(context,morepacks);
+        int i =1,j=1;
+                    for (Field f : ID_Fields) {
+                        if(f.getName().contains("sticker_")){
+                            try {
+                                Sticker sticker = new Sticker();
+                                sticker.setStickerName(f.getName());
+                                sticker.setPath(bobblePrefs.privateDirectory().get() + "/" + f.getName() + ".jpg");
+                                sticker.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
+                                StickersRepository.insertOrUpdate(context, sticker);
+                                SaveUtils.saveGiforJPG(context, bobblePrefs.privateDirectory().get(), getResources().getIdentifier(f.getName(), "drawable", getPackageName()), "jpg", f.getName());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                            }
+                        }else if(f.getName().contains("gif_")){
+                            try {
+                                Gifs gifs =new Gifs();
+                                gifs.setGifName(f.getName());
+                                gifs.setPath(bobblePrefs.privateDirectory().get()+"/"+f.getName()+".gif");
+                                gifs.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
+                                GifsRepository.insertOrUpdate(context,gifs);
+
+                                SaveUtils.saveGiforJPG(context,bobblePrefs.privateDirectory().get(),getResources().getIdentifier(f.getName(), "drawable", getPackageName()),"gif",f.getName());
+                            }catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            }else if(f.getName().contains("advertisement_")){
+                            try {
+                                Morepacks morepacks = new Morepacks();
+                                morepacks.setPackName(f.getName());
+                                morepacks.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
+                                MorePacksRepository.insertOrUpdate(context,morepacks);
+                            }catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                        StickersRepository.insertOrUpdate(context,new Sticker());
-                        GifsRepository.insertOrUpdate(context,new Gifs());
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
-            }
 
     private void createBobbleDirectory(String storageType) {
 

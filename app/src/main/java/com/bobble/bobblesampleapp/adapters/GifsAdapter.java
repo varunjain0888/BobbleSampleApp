@@ -1,12 +1,20 @@
 package com.bobble.bobblesampleapp.adapters;
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.IntentCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.activities.MainActivity;
@@ -25,7 +34,9 @@ import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import pl.droidsonroids.gif.GifImageView;
@@ -48,13 +59,33 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private BobblePrefs bobblePrefs;
 
+
     Intent sendIntent = new Intent(Intent.ACTION_SEND);
     Uri imageUri = null;
     public GifsAdapter(Activity activity ,List<Gifs> horizontalList) {
         this.list = horizontalList;
         this.activity = activity;
-        Collections.reverse(list);
-        bobblePrefs = new BobblePrefs(activity);
+
+        //Sorting array according to required sequence
+
+            for(int i = 0; i<list.size();i++){
+                String name = list.get(i).getGifName().substring(4);
+                list.get(i).setGifName(name);
+            }
+            Collections.sort(list, new Comparator<Gifs>() {
+                @Override
+                public int compare(Gifs o1, Gifs o2) {
+
+                    return Integer.parseInt(o1.getGifName())-Integer.parseInt(o2.getGifName());
+                }
+            });
+
+            bobblePrefs = new BobblePrefs(activity);
+            for (int i = 0; i < list.size()+1; i++) {
+            if((i+1 )% 5 ==0 && i!=5){
+                list.add(i,new Gifs());
+            }
+        }
     }
 
 
@@ -83,21 +114,23 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((GifViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())),list.get(position).getPath());
+                    //Bobble Analytics
+                    BobbleEvent.getInstance().log("Home Screen","Tap on gif","tap_on_gif",list.get(position).getGifName(),System.currentTimeMillis()/1000);
+                    ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())),list.get(position).getPath(),"gif");
                 }
             });
             ((GifViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
             ((GifViewHolder)holder).ivfacebook.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    share(list.get(position).getPath(), BobbleConstants.FACEBOOK_PACKAGE_NAME,BobbleConstants.FACEBOOK_CLASS_NAME,((GifsAdapter.GifViewHolder)holder));
+                    share(list.get(position).getPath(), BobbleConstants.FACEBOOK_PACKAGE_NAME,BobbleConstants.FACEBOOK_CLASS_NAME,((GifsAdapter.GifViewHolder)holder),list.get(position).getGifName());
                 }
             });
 
             ((GifsAdapter.GifViewHolder)holder).ivWhatsapp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    share(list.get(position).getPath(),BobbleConstants.WHATSAPP_PACKAGE_NAME,BobbleConstants.WHATSAPP_CLASS_NAME,((GifsAdapter.GifViewHolder)holder));
+                    share(list.get(position).getPath(),BobbleConstants.WHATSAPP_PACKAGE_NAME,BobbleConstants.WHATSAPP_CLASS_NAME,((GifsAdapter.GifViewHolder)holder),list.get(position).getGifName());
                 }
             });
 
@@ -114,20 +147,39 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             });
         }
     }
-    void share(String path,String packageName, String activityName,GifViewHolder gifViewHolder){
+    void share(String path,String packageName, String activityName,GifViewHolder gifViewHolder,String id){
         File f = new File(path);
-        Uri uri = Uri.fromFile(f);
-        sendIntent.setType("image/gif");
-        ComponentName name = new ComponentName(packageName,activityName);
-        Log.d("", "ComponentName : " + name);
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        shareIntent.setType("image/gif");
-        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        shareIntent.setComponent(name);
-        activity.startActivity(shareIntent);
+
+        Uri uri =null;
+
+        File newFile = new File(path);
+
+        uri = FileProvider.getUriForFile(activity, "com.bobble.bobblesampleapp.fileprovider", newFile);
+
+        /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            uri = Uri.fromFile(f);
+        }*/
+        PackageManager pm=activity.getPackageManager();
+        try{
+            sendIntent.setType("image/gif");
+            ComponentName name = new ComponentName(packageName,activityName);
+            Log.d("", "ComponentName : " + name);
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            PackageInfo info=pm.getPackageInfo(packageName, PackageManager.GET_META_DATA);
+            shareIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+            shareIntent.setType("image/gif");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            shareIntent.setFlags(IntentCompat.FLAG_ACTIVITY_CLEAR_TASK);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            shareIntent.setComponent(name);
+            if(packageName.contains("whatsapp")){
+                activity.startActivityForResult(shareIntent, MainActivity.GIF_WHATSAPP_SUCCESS);
+            }else{
+                activity.startActivityForResult(shareIntent, MainActivity.GIF_FACEBOOK_SUCCESS);
+            }
+        }catch(PackageManager.NameNotFoundException e){
+            Toast.makeText(activity,"Application not found",Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -137,12 +189,10 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
+        if(list.get(position)!=null && !TextUtils.isEmpty(list.get(position).getGifName())){
             return TYPE_ITEM;
-        } else if (position == list.size()-1) {
-            return TYPE_FOOTER;
         }
-        return TYPE_ITEM;
+        return TYPE_FOOTER;
     }
 
 
