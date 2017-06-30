@@ -1236,4 +1236,20 @@ public final class BobblePrefs extends SharedPreferencesHelper {
     public BooleanPrefField isContentLanguageSwitchedToSysLanguageEventSent() {
         return booleanField("isContentLanguageSwitchedToSysLanguageEventSent", false);
     }
+
+    public BooleanPrefField isStickerScrollEndEventLogged() {
+        return booleanField("stickersrollend", false);
+    }
+
+    public BooleanPrefField isGifScrollEndEventLogged() {
+        return booleanField("gifscrollend", false);
+    }
+
+    public BooleanPrefField isScrollOnGoogleplayScreenshotEventLogged() {
+        return booleanField("gifscrollend", false);
+    }
+
+    public BooleanPrefField isTapOnGoogleplayScreenshotEventLogged() {
+        return booleanField("gifscrollend", false);
+    }
 }

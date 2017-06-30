@@ -21,7 +21,7 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".BobbleSampleApp">
+        android:name=".GrowthApp">
         <activity android:name=".activities.SplashActivity"
             android:configChanges="orientation|keyboardHidden"
             android:launchMode="singleTask"

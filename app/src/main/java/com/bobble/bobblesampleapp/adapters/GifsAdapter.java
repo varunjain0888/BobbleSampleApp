@@ -119,7 +119,10 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())),list.get(position).getPath(),"gif");
                 }
             });
-            ((GifViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
+
+            ((GifViewHolder)holder).ivImage.setImageURI(FileProvider.getUriForFile(activity, "com.bobble.bobblesampleapp.fileprovider", new File(list.get(position).getPath())));
+
+
             ((GifViewHolder)holder).ivfacebook.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -138,8 +141,8 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((FooterViewHolder)holder).ivGoogleplaystore.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Hack app analytics
-                    BobbleEvent.getInstance().log(BobbleConstants.HOME_SCREEN, "click on get more love gifs", "google_play_store_view", "", System.currentTimeMillis() / 1000);
+                    //Growth app analytics
+                    BobbleEvent.getInstance().log(BobbleConstants.HOME_SCREEN, "click on get more love gifs", "gif_scroll_go_to_play_store", "", System.currentTimeMillis() / 1000);
                     Intent i = new Intent(android.content.Intent.ACTION_VIEW);
                     i.setData(Uri.parse(BobbleConstants.GOOGLE_PLAY_STORE_LINK_TO_BOOBLE));
                     activity.startActivity(i);
@@ -154,7 +157,11 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         File newFile = new File(path);
 
-        uri = FileProvider.getUriForFile(activity, "com.bobble.bobblesampleapp.fileprovider", newFile);
+        try {
+            uri = FileProvider.getUriForFile(activity, "com.bobble.bobblesampleapp.fileprovider", newFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             uri = Uri.fromFile(f);
@@ -173,9 +180,11 @@ public class GifsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             shareIntent.setComponent(name);
             if(packageName.contains("whatsapp")){
-                activity.startActivityForResult(shareIntent, MainActivity.GIF_WHATSAPP_SUCCESS);
+                BobbleEvent.getInstance().log("Home Screen","Share gif","share_sticker_whatsapp_icon",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
+                activity.startActivity(shareIntent);
             }else{
-                activity.startActivityForResult(shareIntent, MainActivity.GIF_FACEBOOK_SUCCESS);
+                BobbleEvent.getInstance().log("Home Screen","Share gif","share_sticker_fb_icon",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
+                activity.startActivity(shareIntent);
             }
         }catch(PackageManager.NameNotFoundException e){
             Toast.makeText(activity,"Application not found",Toast.LENGTH_SHORT).show();

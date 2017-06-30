@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.activities.MainActivity;
+import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,11 +169,12 @@ public class GifShareAsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 shareIntent.setComponent(name);
                 if(shareIntent!=null){
                     if(type.equalsIgnoreCase("gif")){
-                        context.startActivityForResult(shareIntent, MainActivity.GIF_POPUP__SUCCESS);
+                        BobbleEvent.getInstance().log("Home Screen","Share gif","share_sticker_popup",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
+                        context.startActivity(shareIntent);
                     }else{
-                        context.startActivityForResult(shareIntent, MainActivity.STICKER_POPUP_SUCCESS);
+                        BobbleEvent.getInstance().log("Home Screen","Share sticker","share_gif_popup",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
+                        context.startActivity(shareIntent);
                     }
-
                 }else{
                     Toast.makeText(context,"Application not found",Toast.LENGTH_SHORT).show();
                 }

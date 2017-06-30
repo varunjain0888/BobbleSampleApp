@@ -2,7 +2,7 @@ package com.bobble.bobblesampleapp.database.repository;
 
 import android.content.Context;
 
-import com.bobble.bobblesampleapp.BobbleSampleApp;
+import com.bobble.bobblesampleapp.GrowthApp;
 import com.bobble.bobblesampleapp.database.Sticker;
 import com.bobble.bobblesampleapp.database.StickerDao;
 
@@ -37,6 +37,6 @@ public class StickersRepository {
         return getstickerDao(context).load(id);
     }
     public static StickerDao getstickerDao(Context c) {
-        return ((BobbleSampleApp) c.getApplicationContext()).getDaoSession().getStickerDao();
+        return ((GrowthApp) c.getApplicationContext()).getDaoSession().getStickerDao();
     }
 }

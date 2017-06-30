@@ -6,11 +6,13 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
+        bobblePrefs = new BobblePrefs(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -77,13 +80,14 @@ public class MainActivity extends AppCompatActivity {
         //Hack app analytics
         BobbleEvent.getInstance().log(BobbleConstants.HOME_SCREEN, "Landed on the home screen", "home_screen_view", "", System.currentTimeMillis() / 1000);
         getIds();
-        bobblePrefs = new BobblePrefs(this);
+
         slide_up = AnimationUtils.loadAnimation(context, R.anim.slide_up);
         slide_down = AnimationUtils.loadAnimation(context, R.anim.slide_down);
 
     }
 
     private void getIds() {
+        //bobblePrefs.appOpenedCount().put(bobblePrefs.appOpenedCount().get()+1);
         llShare = (LinearLayout) findViewById(R.id.llShare);
         rvGifs = (RecyclerView) findViewById(R.id.rvGifs);
         rvMore = (RecyclerView) findViewById(R.id.rvMore);
@@ -121,14 +125,59 @@ public class MainActivity extends AppCompatActivity {
         ivGoogleplaystore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                BobbleEvent.getInstance().log("Home Screen","Go to play store tapped","footer_go_to_play_store","",System.currentTimeMillis()/1000);
                 Intent i = new Intent(android.content.Intent.ACTION_VIEW);
                 i.setData(Uri.parse(BobbleConstants.GOOGLE_PLAY_STORE_LINK_TO_BOOBLE));
                 startActivity(i);
             }
         });
 
-    }
+        rvGifs.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(!rvGifs.canScrollHorizontally(View.SCROLL_AXIS_HORIZONTAL)){
+                    if(!bobblePrefs.isGifScrollEndEventLogged().get()){
+                        BobbleEvent.getInstance().log("Home Screen","Scroll end reached","gif_scroll_end_reached","",System.currentTimeMillis()/1000);
+                        bobblePrefs.isGifScrollEndEventLogged().put(true);
+                    }
+                }
+            }
+        });
 
+        rvSticker.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(!rvSticker.canScrollHorizontally(View.SCROLL_AXIS_HORIZONTAL)){
+                    if(!bobblePrefs.isStickerScrollEndEventLogged().get()){
+                        BobbleEvent.getInstance().log("Home Screen","Scroll end reached","gif_scroll_end_reached","",System.currentTimeMillis()/1000);
+                        bobblePrefs.isStickerScrollEndEventLogged().put(true);
+                    }
+                }
+            }
+        });
+
+    }
+    public static boolean isAtBottom(RecyclerView recyclerView) {
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            return isAtBottomBeforeIceCream(recyclerView);
+        } else {
+            return !ViewCompat.canScrollVertically(recyclerView, 1);
+        }
+    }
+    private static boolean isAtBottomBeforeIceCream(RecyclerView recyclerView) {
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        int count = recyclerView.getAdapter().getItemCount();
+        if (layoutManager instanceof LinearLayoutManager) {
+            LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
+            int pos = linearLayoutManager.findLastVisibleItemPosition();
+            int lastChildBottom = linearLayoutManager.findViewByPosition(pos).getBottom();
+            if (lastChildBottom == recyclerView.getHeight() - recyclerView.getPaddingBottom() && pos == count - 1)
+                return true;
+        }
+        return false;
+    }
     public static Intent getStartIntent(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         return intent;
@@ -141,7 +190,11 @@ public class MainActivity extends AppCompatActivity {
         File f = new File(path);
         Uri uri =null;
         File newFile = new File(path);
-        uri = FileProvider.getUriForFile(this, "com.bobble.bobblesampleapp.fileprovider", newFile);
+        try {
+            uri = FileProvider.getUriForFile(this, "com.bobble.bobblesampleapp.fileprovider", newFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
        /* if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             uri = Uri.fromFile(f);
         }*/
@@ -175,17 +228,14 @@ public class MainActivity extends AppCompatActivity {
             }else {
                 Toast.makeText(context,"Sharing cancelled",Toast.LENGTH_SHORT).show();
             }*/
-            BobbleEvent.getInstance().log("Home Screen","Share gif","share_sticker_fb_icon",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
 
         }else if(requestCode==GIF_WHATSAPP_SUCCESS){
             /*if(resultCode==RESULT_OK){
             }else {
                 Toast.makeText(context,"Sharing cancelled",Toast.LENGTH_SHORT).show();
             }*/
-            BobbleEvent.getInstance().log("Home Screen","Share gif","share_sticker_whatsapp_icon",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
 
         }else if(requestCode==GIF_POPUP__SUCCESS){
-            BobbleEvent.getInstance().log("Home Screen","Share gif","share_sticker_popup",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
 
             /*if(resultCode==RESULT_OK){
             }else {
@@ -196,21 +246,18 @@ public class MainActivity extends AppCompatActivity {
             }else {
                 Toast.makeText(context,"Sharing cancelled",Toast.LENGTH_SHORT).show();
             }*/
-            BobbleEvent.getInstance().log("Home Screen","Share sticker","share_gif_fb_icon",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
 
         }else if(requestCode==STICKER_WHATSAPP_SUCCESS){
             /*if(resultCode==RESULT_OK){
             }else {
                 Toast.makeText(context,"Sharing cancelled",Toast.LENGTH_SHORT).show();
             }*/
-            BobbleEvent.getInstance().log("Home Screen","Share sticker","share_gif_whatsapp_icon",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
 
         }else if(requestCode==STICKER_POPUP_SUCCESS){
             /*if(resultCode==RESULT_OK){
             }else {
                 Toast.makeText(context,"Sharing cancelled",Toast.LENGTH_SHORT).show();
             }*/
-            BobbleEvent.getInstance().log("Home Screen","Share sticker","share_gif_popup",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
 
         }
     }

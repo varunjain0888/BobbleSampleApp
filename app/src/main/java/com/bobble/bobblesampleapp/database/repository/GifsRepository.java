@@ -2,7 +2,7 @@ package com.bobble.bobblesampleapp.database.repository;
 
 import android.content.Context;
 
-import com.bobble.bobblesampleapp.BobbleSampleApp;
+import com.bobble.bobblesampleapp.GrowthApp;
 import com.bobble.bobblesampleapp.database.Gifs;
 import com.bobble.bobblesampleapp.database.GifsDao;
 
@@ -36,6 +36,6 @@ public class GifsRepository {
         return getGifDao(context).load(id);
     }
     public static GifsDao getGifDao(Context c) {
-        return ((BobbleSampleApp) c.getApplicationContext()).getDaoSession().getGifsDao();
+        return ((GrowthApp) c.getApplicationContext()).getDaoSession().getGifsDao();
     }
 }

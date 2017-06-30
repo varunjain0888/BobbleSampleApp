@@ -117,42 +117,20 @@ public class SaveUtils {
                     }else if(type.equalsIgnoreCase("jpeg")){
                         file = new File(path,name+ ".jpeg");
                     }
-
-
                     long startTime = System.currentTimeMillis();
-
-                    BLog.d(TAG, "on do in background, url open connection");
-
                     InputStream is = context.getResources().openRawResource(resId);
-                    BLog.d(TAG, "on do in background, url get input stream");
                     BufferedInputStream bis = new BufferedInputStream(is);
-                    BLog.d(TAG, "on do in background, create buffered input stream");
-
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    BLog.d(TAG, "on do in background, create buffered array output stream");
-
                     byte[] img = new byte[1024];
-
                     int current = 0;
-
-                    BLog.d(TAG, "on do in background, write byte to baos");
                     while ((current = bis.read()) != -1) {
                         baos.write(current);
                     }
-
-
-                    BLog.d(TAG, "on do in background, done write");
-
-                    BLog.d(TAG, "on do in background, create fos");
                     FileOutputStream fos = new FileOutputStream(file);
                     fos.write(baos.toByteArray());
-
-                    BLog.d(TAG, "on do in background, write to fos");
                     fos.flush();
-
                     fos.close();
                     is.close();
-                    BLog.d(TAG, "on do in background, done write to fos");
                 }
                 catch (Exception e) {
                     e.printStackTrace();

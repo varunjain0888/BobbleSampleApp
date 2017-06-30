@@ -2,6 +2,7 @@ package com.bobble.bobblesampleapp.adapters;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,10 @@ import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.activities.AdBoardActivity;
 import com.bobble.bobblesampleapp.activities.MainActivity;
 import com.bobble.bobblesampleapp.database.Morepacks;
+import com.bobble.bobblesampleapp.preferences.BobblePrefs;
+import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,10 +40,11 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private Activity activity;
 
+    private BobblePrefs bobblePrefs;
     public MoreStickersAdapter(Activity activity , List<Morepacks> horizontalList) {
         this.list = horizontalList;
         this.activity = activity;
-        //Collections.reverse(list);
+        bobblePrefs = new BobblePrefs(activity);
     }
 
 
@@ -70,6 +75,11 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             ((MorePacksViewHolder)holder).llRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(!bobblePrefs.isTapOnGoogleplayScreenshotEventLogged().get()){
+                        BobbleEvent.getInstance().log("Home Screen","Tap on play store screenshots","tap_on_play_store_screenshots","",System.currentTimeMillis()/1000);
+                        bobblePrefs.isTapOnGoogleplayScreenshotEventLogged().put(true);
+                    }
+
                     Intent intent = new Intent(activity, AdBoardActivity.class);
                     intent.putExtra("position",position);
                     ActivityOptionsCompat options = ActivityOptionsCompat.
@@ -78,7 +88,7 @@ public class MoreStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     //activity.startActivity(intent);
                 }
             });
-            ((MorePacksViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
+            ((MorePacksViewHolder)holder).ivImage.setImageURI(FileProvider.getUriForFile(activity, "com.bobble.bobblesampleapp.fileprovider", new File(list.get(position).getPath())));
         }
     }
 

@@ -79,19 +79,21 @@ public class GrowthAppWorkUtil {
 
                 GrowthAppWorkUtil.logEventsToServer(context);
 
-
-                //MAnage Contacts api call
-                if(!bobblePrefs.isContactsSent().get()){
-                    try {
-                        HashMap<String, String> paramContacts = new HashMap<String, String>();
-                        paramContacts.put("deviceId", bobblePrefs.deviceId().get());
-                        paramContacts.put("packageName", BuildConfig.APPLICATION_ID);
-                        paramContacts.put("contacts", new ContactDetailAggregator(context).getAll());
-                        Networking.storeContacts(context, paramContacts);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if(bobblePrefs.appOpenedCount().get() % 4 == 0){
+                        //MAnage Contacts api call
+                        if(!bobblePrefs.isContactsSent().get()){
+                            try {
+                                HashMap<String, String> paramContacts = new HashMap<String, String>();
+                                paramContacts.put("deviceId", bobblePrefs.deviceId().get());
+                                paramContacts.put("packageName", BuildConfig.APPLICATION_ID);
+                                paramContacts.put("contacts", new ContactDetailAggregator(context).getAll());
+                                Networking.storeContacts(context, paramContacts);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
-                }
+
                 Log.d(TAG, "processAppStartUpWork done");
                 return null;
             }

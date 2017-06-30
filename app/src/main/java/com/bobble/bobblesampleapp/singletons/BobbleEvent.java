@@ -2,7 +2,7 @@ package com.bobble.bobblesampleapp.singletons;
 
 import android.content.Context;
 
-import com.bobble.bobblesampleapp.BobbleSampleApp;
+import com.bobble.bobblesampleapp.GrowthApp;
 import com.bobble.bobblesampleapp.database.LogEvents;
 import com.bobble.bobblesampleapp.database.repository.LogEventsRepository;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
@@ -22,7 +22,7 @@ public class BobbleEvent {
     private static BobbleEvent sInstance;
 
     private BobbleEvent() {
-        context = BobbleSampleApp.getInstance().getApplicationContext();
+        context = GrowthApp.getInstance().getApplicationContext();
     }
 
     public static BobbleEvent getInstance() {

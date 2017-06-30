@@ -5,7 +5,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,10 +15,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Window;
-import android.view.WindowManager;
 
-import com.bobble.bobblesampleapp.BobbleSampleApp;
+import com.bobble.bobblesampleapp.GrowthApp;
 import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.database.Gifs;
 import com.bobble.bobblesampleapp.database.Morepacks;
@@ -34,7 +31,6 @@ import com.bobble.bobblesampleapp.services.BackgroundJob;
 import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 import com.bobble.bobblesampleapp.util.BLog;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
-import com.bobble.bobblesampleapp.util.FileUtil;
 import com.bobble.bobblesampleapp.util.GrowthAppWorkUtil;
 import com.bobble.bobblesampleapp.util.SaveUtils;
 import com.evernote.android.job.JobManager;
@@ -80,6 +76,12 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
         setContentView(R.layout.activity_splash);
         context = this;
         bobblePrefs = new BobblePrefs(context);
+
+        bobblePrefs.isTapOnGoogleplayScreenshotEventLogged().put(false);
+        bobblePrefs.isScrollOnGoogleplayScreenshotEventLogged().put(false);
+        bobblePrefs.isStickerScrollEndEventLogged().put(false);
+        bobblePrefs.isGifScrollEndEventLogged().put(false);
+
         bytearrayoutputstream =new ByteArrayOutputStream();
         getIds();
         setData();
@@ -140,7 +142,7 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
 
         try {
             if (!bobblePrefs.disableSimilarWebSDK().get()) {
-                ((BobbleSampleApp) getApplicationContext()).initialiseSimilarWeb();
+                ((GrowthApp) getApplicationContext()).initialiseSimilarWeb();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -284,7 +286,6 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
                                 gifs.setPath(bobblePrefs.privateDirectory().get()+"/"+f.getName()+".gif");
                                 gifs.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
                                 GifsRepository.insertOrUpdate(context,gifs);
-
                                 SaveUtils.saveGiforJPG(context,bobblePrefs.privateDirectory().get(),getResources().getIdentifier(f.getName(), "drawable", getPackageName()),"gif",f.getName());
                             }catch (Exception e) {
                                 e.printStackTrace();
@@ -293,8 +294,10 @@ public class SplashActivity extends AppCompatActivity implements ActivityCompat.
                             try {
                                 Morepacks morepacks = new Morepacks();
                                 morepacks.setPackName(f.getName());
+                                morepacks.setPath(bobblePrefs.privateDirectory().get() + "/" + f.getName() + ".png");
                                 morepacks.setId(getResources().getIdentifier(f.getName(), "drawable", getPackageName()));
                                 MorePacksRepository.insertOrUpdate(context,morepacks);
+                                SaveUtils.saveGiforJPG(context,bobblePrefs.privateDirectory().get(),getResources().getIdentifier(f.getName(), "drawable", getPackageName()),"png",f.getName());
                             }catch (Exception e) {
                                 e.printStackTrace();
                             }

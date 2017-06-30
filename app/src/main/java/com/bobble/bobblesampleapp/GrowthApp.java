@@ -2,7 +2,6 @@ package com.bobble.bobblesampleapp;
 
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.StrictMode;
 
 import com.androidnetworking.AndroidNetworking;
 import com.bobble.bobblesampleapp.database.DaoMaster;
@@ -20,8 +19,8 @@ import co.tmobi.Skydive;
  * Created by varunjain on 6/23/17.
  */
 
-public class BobbleSampleApp extends Application {
-    private static BobbleSampleApp appInstance;
+public class GrowthApp extends Application {
+    private static GrowthApp appInstance;
     private DaoSession daoSession;
 
 
@@ -62,7 +61,7 @@ public class BobbleSampleApp extends Application {
     public DaoSession getDaoSession() {
         return daoSession;
     }
-    public static synchronized BobbleSampleApp getInstance() {
+    public static synchronized GrowthApp getInstance() {
         return appInstance;
     }
     public void initialiseSimilarWeb() {

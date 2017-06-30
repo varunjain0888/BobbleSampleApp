@@ -152,6 +152,7 @@ public class Networking {
         for (int i = 0; i < logEventsList.size(); i++) {
             logEventsList.get(i).setStatus(BobbleConstants.SENDING);
         }
+
         LogEventsRepository.getLogEventsDao(context).insertOrReplaceInTx(logEventsList);
 
         AndroidNetworking.post(ApiEndPoint.LOG_EVENTS)

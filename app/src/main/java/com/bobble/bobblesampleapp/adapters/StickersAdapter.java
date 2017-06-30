@@ -92,7 +92,7 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (viewType == TYPE_ITEM) {
             //Inflating recycle view item layout
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gifs, parent, false);
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sticker, parent, false);
             return new StickersAdapter.StickerViewHolder(itemView);
         } else if (viewType == TYPE_HEADER) {
             //Inflating header view
@@ -117,7 +117,8 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     ((MainActivity)activity).openSharingDialog(Integer.parseInt(String.valueOf(list.get(position).getId())),list.get(position).getPath(),"sticker");
                 }
             });
-            ((StickersAdapter.StickerViewHolder)holder).ivImage.setBackgroundResource(Integer.parseInt(String.valueOf(list.get(position).getId())));
+
+            ((StickersAdapter.StickerViewHolder)holder).ivImage.setImageURI(FileProvider.getUriForFile(activity, "com.bobble.bobblesampleapp.fileprovider", new File(list.get(position).getPath())));
 
             ((StickerViewHolder)holder).ivfacebook.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -137,8 +138,8 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((StickersAdapter.FooterViewHolder)holder).ivGoogleplaystore.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Hack App analytics
-                    BobbleEvent.getInstance().log(BobbleConstants.HOME_SCREEN, "click on get more love stickers", "google_play_store_view", "", System.currentTimeMillis() / 1000);
+                    //Growth App analytics
+                    BobbleEvent.getInstance().log(BobbleConstants.HOME_SCREEN, "click on get more love stickers", "sticker_scroll_go_to_play_store", "", System.currentTimeMillis() / 1000);
                     Intent i = new Intent(android.content.Intent.ACTION_VIEW);
                     i.setData(Uri.parse(BobbleConstants.GOOGLE_PLAY_STORE_LINK_TO_BOOBLE));
                     activity.startActivity(i);
@@ -148,18 +149,16 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
     void share(String path,String packageName, String activityName){
         File f = new File(path);
-
         Uri uri =null;
-
-
         File newFile = new File(path);
-
-        uri = FileProvider.getUriForFile(activity, "com.bobble.bobblesampleapp.fileprovider", newFile);
-
+        try {
+            uri = FileProvider.getUriForFile(activity, "com.bobble.bobblesampleapp.fileprovider", newFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
        /* if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             uri = Uri.fromFile(f);
         }*/
-
         PackageManager pm=activity.getPackageManager();
         try{
         sendIntent.setType("image/gif");
@@ -174,9 +173,11 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         shareIntent.setComponent(name);
             if(packageName.contains("whatsapp")){
-                activity.startActivityForResult(shareIntent, MainActivity.STICKER_WHATSAPP_SUCCESS);
+                BobbleEvent.getInstance().log("Home Screen","Share sticker","share_gif_whatsapp_icon",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
+                activity.startActivity(shareIntent);
             }else{
-                activity.startActivityForResult(shareIntent, MainActivity.STICKER_FACEBOOK_SUCCESS);
+                BobbleEvent.getInstance().log("Home Screen","Share sticker","share_gif_fb_icon",String.valueOf(System.currentTimeMillis()/1000),System.currentTimeMillis()/1000);
+                activity.startActivity(shareIntent);
             }
         }catch(PackageManager.NameNotFoundException e){
             Toast.makeText(activity,"Application not found",Toast.LENGTH_SHORT).show();
@@ -199,13 +200,13 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public class StickerViewHolder extends RecyclerView.ViewHolder {
 
         public LinearLayout llRoot;
-        public GifImageView ivImage;
+        public ImageView ivImage;
         public ImageView ivfacebook;
         public ImageView ivWhatsapp;
 
         public StickerViewHolder(View view) {
             super(view);
-            ivImage = (GifImageView)view.findViewById(R.id.ivImage);
+            ivImage = (ImageView) view.findViewById(R.id.ivImage);
             llRoot = (LinearLayout) view.findViewById(R.id.llRoot);
             ivfacebook = (ImageView)view.findViewById(R.id.ivfacebook);
             ivWhatsapp = (ImageView)view.findViewById(R.id.ivWhatsapp);

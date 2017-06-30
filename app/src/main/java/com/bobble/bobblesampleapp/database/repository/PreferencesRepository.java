@@ -3,7 +3,7 @@ package com.bobble.bobblesampleapp.database.repository;
 import android.content.Context;
 
 
-import com.bobble.bobblesampleapp.BobbleSampleApp;
+import com.bobble.bobblesampleapp.GrowthApp;
 import com.bobble.bobblesampleapp.database.Preferences;
 import com.bobble.bobblesampleapp.database.PreferencesDao;
 
@@ -36,6 +36,6 @@ public class PreferencesRepository {
     }
 
     public static PreferencesDao getPreferencesDao(Context c) {
-        return ((BobbleSampleApp) c.getApplicationContext()).getDaoSession().getPreferencesDao();
+        return ((GrowthApp) c.getApplicationContext()).getDaoSession().getPreferencesDao();
     }
 }

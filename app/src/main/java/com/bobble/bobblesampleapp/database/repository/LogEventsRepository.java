@@ -3,7 +3,7 @@ package com.bobble.bobblesampleapp.database.repository;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabaseLockedException;
 
-import com.bobble.bobblesampleapp.BobbleSampleApp;
+import com.bobble.bobblesampleapp.GrowthApp;
 import com.bobble.bobblesampleapp.database.LogEvents;
 import com.bobble.bobblesampleapp.database.LogEventsDao;
 import com.bobble.bobblesampleapp.util.Utils;
@@ -54,6 +54,6 @@ public class LogEventsRepository {
     }
 
     public static LogEventsDao getLogEventsDao(Context c) {
-        return ((BobbleSampleApp) c.getApplicationContext()).getDaoSession().getLogEventsDao();
+        return ((GrowthApp) c.getApplicationContext()).getDaoSession().getLogEventsDao();
     }
 }

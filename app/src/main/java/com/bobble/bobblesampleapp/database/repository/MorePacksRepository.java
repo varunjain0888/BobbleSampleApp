@@ -2,7 +2,7 @@ package com.bobble.bobblesampleapp.database.repository;
 
 import android.content.Context;
 
-import com.bobble.bobblesampleapp.BobbleSampleApp;
+import com.bobble.bobblesampleapp.GrowthApp;
 import com.bobble.bobblesampleapp.database.Morepacks;
 import com.bobble.bobblesampleapp.database.MorepacksDao;
 
@@ -36,6 +36,6 @@ public class MorePacksRepository {
         return getMorepacksDao(context).load(id);
     }
     public static MorepacksDao getMorepacksDao(Context c) {
-        return ((BobbleSampleApp) c.getApplicationContext()).getDaoSession().getMorepacksDao();
+        return ((GrowthApp) c.getApplicationContext()).getDaoSession().getMorepacksDao();
     }
 }

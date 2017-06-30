@@ -21,6 +21,8 @@ import android.widget.Switch;
 import com.bobble.bobblesampleapp.R;
 import com.bobble.bobblesampleapp.database.Morepacks;
 import com.bobble.bobblesampleapp.database.repository.MorePacksRepository;
+import com.bobble.bobblesampleapp.preferences.BobblePrefs;
+import com.bobble.bobblesampleapp.singletons.BobbleEvent;
 import com.bobble.bobblesampleapp.util.BobbleConstants;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -42,11 +44,14 @@ public class AdBoardActivity extends AppCompatActivity {
     private CirclePageIndicator pageIndicator;
 
     private int pagePosition = 0;
+
+    private BobblePrefs bobblePrefs;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adboard);
         context = this;
+        bobblePrefs = new BobblePrefs(this);
         if(getIntent()!=null){
             pagePosition = getIntent().getIntExtra("position",0);
         }
@@ -113,6 +118,12 @@ public class AdBoardActivity extends AppCompatActivity {
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            if(position>0){
+                if(!bobblePrefs.isScrollOnGoogleplayScreenshotEventLogged().get()){
+                    BobbleEvent.getInstance().log("Home Screen","Scroll on play store screenshots","scroll_on_play_store_screenshots","",System.currentTimeMillis()/1000);
+                    bobblePrefs.isScrollOnGoogleplayScreenshotEventLogged().put(true);
+                }
+            }
         }
 
         @Override
